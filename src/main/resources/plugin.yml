@@ -1,0 +1,4 @@
+name: Black-Market
+version: '1.0'
+main: com.Lino.blackMarket.BlackMarket
+api-version: '1.21'
