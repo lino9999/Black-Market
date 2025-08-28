@@ -1,0 +1,151 @@
+package com.Lino.blackMarket.gui;
+
+import com.Lino.blackMarket.BlackMarket;
+import com.Lino.blackMarket.models.BlackMarketItem;
+import com.Lino.blackMarket.utils.ColorUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+public class BlackMarketGUI {
+
+    private final BlackMarket plugin;
+    private final Player player;
+    private final Inventory inventory;
+    private final DecimalFormat priceFormat = new DecimalFormat("#,##0.00");
+
+    public BlackMarketGUI(BlackMarket plugin, Player player) {
+        this.plugin = plugin;
+        this.player = player;
+
+        String title = ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.title"));
+        this.inventory = Bukkit.createInventory(null, 54, title);
+
+        setupGUI();
+    }
+
+    private void setupGUI() {
+        fillBorders();
+        displayItems();
+    }
+
+    private void fillBorders() {
+        ItemStack border = createBorderItem();
+
+        for (int i = 0; i < 9; i++) {
+            inventory.setItem(i, border);
+            inventory.setItem(45 + i, border);
+        }
+
+        for (int i = 9; i < 45; i += 9) {
+            inventory.setItem(i, border);
+            inventory.setItem(i + 8, border);
+        }
+
+        ItemStack info = createInfoItem();
+        inventory.setItem(4, info);
+    }
+
+    private ItemStack createBorderItem() {
+        ItemStack item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ColorUtil.colorize("&8"));
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    private ItemStack createInfoItem() {
+        ItemStack item = new ItemStack(Material.NETHER_STAR);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.info.title")));
+
+            List<String> lore = new ArrayList<>();
+            for (String line : plugin.getMessageManager().getMessageList("gui.info.lore")) {
+                lore.add(ColorUtil.colorize(line.replace("{balance}",
+                        priceFormat.format(plugin.getEconomy().getBalance(player)))));
+            }
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    private void displayItems() {
+        List<BlackMarketItem> items = plugin.getBlackMarketManager().getTodayItems();
+
+        int[] slots = {10, 11, 12, 13, 14, 15, 16,
+                19, 20, 21, 22, 23, 24, 25,
+                28, 29, 30, 31, 32, 33, 34,
+                37, 38, 39, 40, 41, 42, 43};
+
+        for (int i = 0; i < Math.min(items.size(), slots.length); i++) {
+            BlackMarketItem bmItem = items.get(i);
+            ItemStack displayItem = createMarketItem(bmItem);
+            inventory.setItem(slots[i], displayItem);
+        }
+    }
+
+    private ItemStack createMarketItem(BlackMarketItem bmItem) {
+        ItemStack item = bmItem.getDisplayItem();
+        ItemMeta meta = item.getItemMeta();
+
+        if (meta != null) {
+            String displayName = ColorUtil.colorize(bmItem.getDisplayName());
+
+            if (bmItem.hasDiscount()) {
+                displayName += ColorUtil.colorize(" " + plugin.getMessageManager().getMessage("gui.item.discount")
+                        .replace("{percent}", String.valueOf(bmItem.getDiscountPercentage())));
+            }
+
+            meta.setDisplayName(displayName);
+
+            List<String> lore = new ArrayList<>();
+            for (String line : bmItem.getLore()) {
+                lore.add(ColorUtil.colorize(line));
+            }
+
+            lore.add("");
+
+            if (bmItem.hasDiscount()) {
+                lore.add(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.item.price-original")
+                        .replace("{price}", priceFormat.format(bmItem.getPrice()))));
+                lore.add(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.item.price-discounted")
+                        .replace("{price}", priceFormat.format(bmItem.getDiscountedPrice()))));
+            } else {
+                lore.add(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.item.price")
+                        .replace("{price}", priceFormat.format(bmItem.getPrice()))));
+            }
+
+            int remainingStock = plugin.getBlackMarketManager().getRemainingStock(bmItem.getId());
+            lore.add(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.item.stock")
+                    .replace("{stock}", String.valueOf(remainingStock))
+                    .replace("{max}", String.valueOf(bmItem.getStock()))));
+
+            lore.add("");
+            lore.add(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.item.click-to-buy")));
+
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+        }
+
+        return item;
+    }
+
+    public void open() {
+        player.openInventory(inventory);
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+}

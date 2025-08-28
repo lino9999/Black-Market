@@ -2,3 +2,16 @@ name: Black-Market
 version: '1.0'
 main: com.Lino.blackMarket.BlackMarket
 api-version: '1.21'
+depend: [Vault]
+commands:
+  blackmarket:
+    description: Opens the Black Market GUI
+    usage: /<command>
+    aliases: [bm]
+permissions:
+  blackmarket.use:
+    description: Allows use of the black market
+    default: true
+  blackmarket.admin:
+    description: Admin permissions for black market
+    default: op

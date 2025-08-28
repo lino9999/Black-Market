@@ -1,0 +1,33 @@
+market:
+  open: "&gradient:#FF0080:#8000FF>&l[BLACK MARKET] &fThe shadows stir... The Black Market has opened its doors for the night!"
+  close: "&gradient:#8000FF:#FF0080>&l[BLACK MARKET] &fDawn breaks... The Black Market vanishes into the shadows until nightfall."
+
+gui:
+  title: "&gradient:#FF0080:#8000FF>&lBLACK MARKET"
+  info:
+    title: "&gradient:#FFD700:#FFA500>&lMarket Information"
+    lore:
+      - "&7Welcome to the Black Market!"
+      - "&7"
+      - "&6Your Balance: &e${balance}"
+      - "&7"
+      - "&7Items refresh daily"
+      - "&7Limited stock available!"
+  item:
+    discount: "&gradient:#00FF00:#FFFF00>&l[-{percent}%]"
+    price: "&6Price: &e${price}"
+    price-original: "&6Price: &c&m${price}"
+    price-discounted: "&6Discounted: &a${price}"
+    stock: "&7Stock: &f{stock}/{max}"
+    click-to-buy: "&gradient:#00FF00:#00FFFF>&l➤ Click to purchase!"
+
+purchase:
+  success: "&gradient:#00FF00:#00FFFF>&l[BLACK MARKET] &aSuccessfully purchased {item} &afor &e${price}!"
+  insufficient-funds: "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cYou need &e${price} &cto purchase this item!"
+  out-of-stock: "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cThis item is out of stock!"
+  error: "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cAn error occurred during purchase!"
+
+command:
+  player-only: "&cThis command can only be used by players!"
+  market-closed: "&gradient:#FF6600:#FFCC00>&l[BLACK MARKET] &cThe Black Market is closed! Come back at night (13000-23000 ticks)."
+  reload: "&gradient:#00FF00:#00FFFF>&l[BLACK MARKET] &aConfiguration and messages reloaded!"

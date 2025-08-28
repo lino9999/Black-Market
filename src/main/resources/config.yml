@@ -1,0 +1,107 @@
+settings:
+  max-items-per-day: 9
+  discount-chance: 0.25
+  discount-min: 0.10
+  discount-max: 0.50
+
+items:
+  diamond_sword:
+    display-name: "&gradient:#00BFFF:#1E90FF>&lDiamond Sword"
+    material: DIAMOND_SWORD
+    price: 1500.0
+    stock: 3
+    lore:
+      - "&7A powerful weapon"
+      - "&7forged from diamonds"
+    commands:
+      - "give {player} diamond_sword 1"
+
+  god_apple:
+    display-name: "&gradient:#FFD700:#FFA500>&lEnchanted Golden Apple"
+    material: ENCHANTED_GOLDEN_APPLE
+    price: 5000.0
+    stock: 1
+    lore:
+      - "&7The ultimate healing item"
+      - "&7Grants incredible powers"
+    commands:
+      - "give {player} enchanted_golden_apple 1"
+
+  netherite_armor:
+    display-name: "&gradient:#4B0082:#8A2BE2>&lNetherite Armor Set"
+    material: NETHERITE_CHESTPLATE
+    price: 15000.0
+    stock: 1
+    lore:
+      - "&7Complete netherite armor set"
+      - "&7Maximum protection"
+    commands:
+      - "give {player} netherite_helmet 1"
+      - "give {player} netherite_chestplate 1"
+      - "give {player} netherite_leggings 1"
+      - "give {player} netherite_boots 1"
+
+  totem:
+    display-name: "&gradient:#FF1493:#FF69B4>&lTotem of Undying"
+    material: TOTEM_OF_UNDYING
+    price: 8000.0
+    stock: 2
+    lore:
+      - "&7Saves you from death"
+      - "&7One time use"
+    commands:
+      - "give {player} totem_of_undying 1"
+
+  elytra:
+    display-name: "&gradient:#87CEEB:#00CED1>&lElytra Wings"
+    material: ELYTRA
+    price: 12000.0
+    stock: 1
+    lore:
+      - "&7Fly through the skies"
+      - "&7The ultimate transportation"
+    commands:
+      - "give {player} elytra 1"
+
+  beacon:
+    display-name: "&gradient:#FFFF00:#FFD700>&lBeacon"
+    material: BEACON
+    price: 10000.0
+    stock: 1
+    lore:
+      - "&7Provides powerful effects"
+      - "&7To nearby players"
+    commands:
+      - "give {player} beacon 1"
+
+  shulker_box:
+    display-name: "&gradient:#9370DB:#8B008B>&lShulker Box"
+    material: SHULKER_BOX
+    price: 6000.0
+    stock: 2
+    lore:
+      - "&7Portable storage"
+      - "&7Keep items on death"
+    commands:
+      - "give {player} shulker_box 1"
+
+  dragon_egg:
+    display-name: "&gradient:#FF0000:#8B0000>&lDragon Egg"
+    material: DRAGON_EGG
+    price: 50000.0
+    stock: 1
+    lore:
+      - "&7The rarest item"
+      - "&7Trophy of the End"
+    commands:
+      - "give {player} dragon_egg 1"
+
+  custom_item_example:
+    display-name: "&gradient:#00FF00:#32CD32>&lCustom Plugin Item"
+    material: NETHER_STAR
+    price: 25000.0
+    stock: 1
+    lore:
+      - "&7Example custom item"
+      - "&7From another plugin"
+    command: "/otherplugin give {player} special_item 1"
