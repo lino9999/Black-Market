@@ -1,6 +1,7 @@
 name: Black-Market
 version: '1.0'
 main: com.Lino.blackMarket.BlackMarket
+author: Lino
 api-version: '1.21'
 depend: [Vault]
 commands:
