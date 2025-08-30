@@ -72,6 +72,23 @@ public class MessageManager {
         messagesConfig.set("command.market-closed", "&gradient:#FF6600:#FFCC00>&l[BLACK MARKET] &cThe Black Market is closed! Come back at night (13000-23000 ticks).");
         messagesConfig.set("command.reload", "&gradient:#00FF00:#00FFFF>&l[BLACK MARKET] &aConfiguration and messages reloaded!");
 
+        messagesConfig.set("command.help", Arrays.asList(
+                "&gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+                "&gradient:#FF0080:#8000FF>&l     BLACK MARKET HELP",
+                "&gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+                "",
+                "&6Player Commands:",
+                "&e/blackmarket &7- Open the Black Market",
+                "&e/blackmarket help &7- Show this help message",
+                "",
+                "&6Admin Commands:{admin}",
+                "&e/blackmarket reload &7- Reload configuration{admin}",
+                "&e/blackmarket forceopen &7- Force open the market{admin}",
+                "",
+                "&7Aliases: &f/bm, /blackm, /market",
+                "&gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        ));
+
         saveMessages();
     }
 

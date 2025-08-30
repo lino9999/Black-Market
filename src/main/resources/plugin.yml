@@ -5,8 +5,8 @@ api-version: '1.21'
 depend: [Vault]
 commands:
   blackmarket:
-    description: Opens the Black Market GUI
-    usage: /<command>
+    description: Opens the Black Market GUI or shows help
+    usage: /<command> [help|reload|forceopen]
     aliases: [bm, blackm, market]
     permission: blackmarket.use
 permissions:
