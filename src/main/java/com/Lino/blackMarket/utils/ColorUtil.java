@@ -6,14 +6,18 @@ import java.util.regex.Pattern;
 
 public class ColorUtil {
 
-    private static final Pattern GRADIENT_PATTERN = Pattern.compile("&gradient:(#[A-Fa-f0-9]{6}):(#[A-Fa-f0-9]{6})>([^&]+)");
+    // Updated pattern to handle everything after > including formatting codes
+    private static final Pattern GRADIENT_PATTERN = Pattern.compile("&gradient:(#[A-Fa-f0-9]{6}):(#[A-Fa-f0-9]{6})>(.+?)(?=&gradient:|$)");
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
 
     public static String colorize(String message) {
         if (message == null) return "";
 
+        // Apply gradients first
         message = applyGradients(message);
+        // Then apply hex colors
         message = applyHexColors(message);
+        // Finally translate standard color codes
         message = translateAlternateColorCodes(message);
 
         return message;
@@ -42,41 +46,35 @@ public class ColorUtil {
         int[] startRGB = hexToRGB(startHex);
         int[] endRGB = hexToRGB(endHex);
 
-        int length = text.length();
-        boolean lastWasBold = false;
-        boolean lastWasItalic = false;
-        boolean lastWasUnderline = false;
-        boolean lastWasStrike = false;
+        // First, extract formatting codes at the beginning
+        String formatting = "";
+        String cleanText = text;
+
+        // Check for formatting codes at the start
+        while (cleanText.length() >= 2 && cleanText.charAt(0) == '&') {
+            char code = cleanText.charAt(1);
+            if ("lkomnr".indexOf(code) > -1) {
+                formatting += "&" + code;
+                cleanText = cleanText.substring(2);
+            } else {
+                break;
+            }
+        }
+
+        // Remove any color codes from the text to get the actual characters
+        String textForGradient = cleanText.replaceAll("&[0-9a-fklmnor]", "");
+
+        int length = textForGradient.length();
 
         for (int i = 0; i < length; i++) {
-            char c = text.charAt(i);
-
-            if (c == '&' && i + 1 < length) {
-                char code = text.charAt(i + 1);
-                if (code == 'l') {
-                    lastWasBold = true;
-                    i++;
-                    continue;
-                } else if (code == 'o') {
-                    lastWasItalic = true;
-                    i++;
-                    continue;
-                } else if (code == 'n') {
-                    lastWasUnderline = true;
-                    i++;
-                    continue;
-                } else if (code == 'm') {
-                    lastWasStrike = true;
-                    i++;
-                    continue;
-                }
-            }
+            char c = textForGradient.charAt(i);
 
             if (c == ' ') {
                 result.append(' ');
                 continue;
             }
 
+            // Calculate color for this position
             double ratio = length == 1 ? 0 : (double) i / (length - 1);
 
             int r = (int) (startRGB[0] + (endRGB[0] - startRGB[0]) * ratio);
@@ -85,17 +83,21 @@ public class ColorUtil {
 
             String hex = String.format("#%02x%02x%02x", r, g, b);
 
+            // Apply the color
             try {
                 ChatColor color = ChatColor.of(hex);
                 result.append(color);
-            } catch (NoSuchMethodError e) {
+            } catch (NoSuchMethodError | IllegalArgumentException e) {
+                // Fallback for older versions
                 result.append(translateHexColorCode(hex));
             }
 
-            if (lastWasBold) result.append(ChatColor.BOLD);
-            if (lastWasItalic) result.append(ChatColor.ITALIC);
-            if (lastWasUnderline) result.append(ChatColor.UNDERLINE);
-            if (lastWasStrike) result.append(ChatColor.STRIKETHROUGH);
+            // Apply formatting codes
+            if (formatting.contains("&l")) result.append(ChatColor.BOLD);
+            if (formatting.contains("&o")) result.append(ChatColor.ITALIC);
+            if (formatting.contains("&n")) result.append(ChatColor.UNDERLINE);
+            if (formatting.contains("&m")) result.append(ChatColor.STRIKETHROUGH);
+            if (formatting.contains("&k")) result.append(ChatColor.MAGIC);
 
             result.append(c);
         }
@@ -124,7 +126,8 @@ public class ColorUtil {
             try {
                 ChatColor color = ChatColor.of("#" + hex);
                 replacement = color.toString();
-            } catch (NoSuchMethodError e) {
+            } catch (NoSuchMethodError | IllegalArgumentException e) {
+                // Fallback for older versions
                 replacement = translateHexColorCode("#" + hex);
             }
 
