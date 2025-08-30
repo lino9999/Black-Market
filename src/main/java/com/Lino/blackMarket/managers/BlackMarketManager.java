@@ -21,6 +21,7 @@ public class BlackMarketManager {
     public BlackMarketManager(BlackMarket plugin) {
         this.plugin = plugin;
         this.purchasedStocks = new HashMap<>();
+        this.todayItems = new ArrayList<>();
         this.currentDay = getDayNumber();
         loadTodayItems();
     }

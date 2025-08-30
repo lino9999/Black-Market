@@ -7,7 +7,8 @@ commands:
   blackmarket:
     description: Opens the Black Market GUI
     usage: /<command>
-    aliases: [bm]
+    aliases: [bm, blackm, market]
+    permission: blackmarket.use
 permissions:
   blackmarket.use:
     description: Allows use of the black market

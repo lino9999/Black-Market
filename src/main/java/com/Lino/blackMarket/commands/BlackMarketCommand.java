@@ -29,11 +29,29 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
 
         Player player = (Player) sender;
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("reload") && player.hasPermission("blackmarket.admin")) {
-            plugin.getConfigManager().reload();
-            plugin.getMessageManager().reload();
-            player.sendMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("command.reload")));
+        if (!player.hasPermission("blackmarket.use")) {
+            player.sendMessage(ColorUtil.colorize("&cYou don't have permission to use this command!"));
             return true;
+        }
+
+        if (args.length > 0) {
+            if (args[0].equalsIgnoreCase("reload")) {
+                if (!player.hasPermission("blackmarket.admin")) {
+                    player.sendMessage(ColorUtil.colorize("&cYou don't have permission to reload!"));
+                    return true;
+                }
+                plugin.getConfigManager().reload();
+                plugin.getMessageManager().reload();
+                player.sendMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("command.reload")));
+                return true;
+            }
+
+            if (args[0].equalsIgnoreCase("forceopen") && player.hasPermission("blackmarket.admin")) {
+                BlackMarketGUI gui = new BlackMarketGUI(plugin, player);
+                gui.open();
+                player.sendMessage(ColorUtil.colorize("&aForced open Black Market GUI"));
+                return true;
+            }
         }
 
         if (!plugin.getBlackMarketManager().isOpen()) {
@@ -54,6 +72,9 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1 && sender.hasPermission("blackmarket.admin")) {
             if ("reload".startsWith(args[0].toLowerCase())) {
                 completions.add("reload");
+            }
+            if ("forceopen".startsWith(args[0].toLowerCase())) {
+                completions.add("forceopen");
             }
         }
 

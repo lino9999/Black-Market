@@ -20,7 +20,11 @@ public class DatabaseManager {
             connection = DriverManager.getConnection("jdbc:sqlite:" + plugin.getDataFolder() + "/blackmarket.db");
 
             createTables();
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (ClassNotFoundException e) {
+            plugin.getLogger().severe("SQLite JDBC driver not found! Make sure it's included in the JAR.");
+            e.printStackTrace();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Failed to initialize database!");
             e.printStackTrace();
         }
     }

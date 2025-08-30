@@ -16,14 +16,21 @@ public class ConfigManager {
 
     public ConfigManager(BlackMarket plugin) {
         this.plugin = plugin;
+        createDefaultConfig();
         reload();
     }
 
     public void reload() {
         plugin.reloadConfig();
         config = plugin.getConfig();
+    }
 
-        if (!config.contains("settings")) {
+    private void createDefaultConfig() {
+        if (!plugin.getDataFolder().exists()) {
+            plugin.getDataFolder().mkdirs();
+        }
+
+        if (!plugin.getConfig().contains("settings")) {
             setDefaults();
         }
     }

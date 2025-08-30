@@ -27,16 +27,28 @@ public final class BlackMarket extends JavaPlugin {
         }
 
         saveDefaultConfig();
+        if (!getDataFolder().exists()) {
+            getDataFolder().mkdirs();
+        }
 
         configManager = new ConfigManager(this);
         messageManager = new MessageManager(this);
         databaseManager = new DatabaseManager(this);
         blackMarketManager = new BlackMarketManager(this);
 
-        getCommand("blackmarket").setExecutor(new BlackMarketCommand(this));
+        BlackMarketCommand commandExecutor = new BlackMarketCommand(this);
+        if (getCommand("blackmarket") != null) {
+            getCommand("blackmarket").setExecutor(commandExecutor);
+            getCommand("blackmarket").setTabCompleter(commandExecutor);
+        } else {
+            getLogger().severe("Failed to register blackmarket command!");
+        }
+
         getServer().getPluginManager().registerEvents(new GUIListener(this), this);
 
         blackMarketManager.startScheduler();
+
+        getLogger().info("Black Market plugin has been enabled!");
     }
 
     @Override
