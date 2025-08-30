@@ -4,6 +4,18 @@ settings:
   discount-min: 0.10
   discount-max: 0.50
 
+  # Schedule mode: "minecraft-night" or "real-time"
+  schedule-mode: minecraft-night
+
+  # If using real-time mode, specify timezone (e.g., "UTC", "America/New_York", "Europe/Rome")
+  timezone: UTC
+
+  # If using real-time mode, specify open hours (24h format)
+  # Format: "HH:MM-HH:MM" (can span midnight)
+  open-hours:
+    - "20:00-23:59"
+    - "00:00-02:00"
+
 items:
   diamond_sword:
     display-name: "&gradient:#00BFFF:#1E90FF>&lDiamond Sword"
@@ -104,4 +116,5 @@ items:
     lore:
       - "&7Example custom item"
       - "&7From another plugin"
-    command: "/otherplugin give {player} special_item 1"
+    commands:
+      - "otherplugin give {player} special_item 1"

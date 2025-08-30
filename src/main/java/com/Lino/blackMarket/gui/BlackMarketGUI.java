@@ -121,6 +121,9 @@ public class BlackMarketGUI {
 
             lore.add("");
 
+            int remainingStock = plugin.getBlackMarketManager().getRemainingStock(bmItem.getId());
+            boolean isOutOfStock = remainingStock <= 0;
+
             if (bmItem.hasDiscount()) {
                 String originalPrice = plugin.getMessageManager().getMessage("gui.item.price-original");
                 if (originalPrice != null && !originalPrice.contains("not found")) {
@@ -147,7 +150,6 @@ public class BlackMarketGUI {
                 }
             }
 
-            int remainingStock = plugin.getBlackMarketManager().getRemainingStock(bmItem.getId());
             String stockMsg = plugin.getMessageManager().getMessage("gui.item.stock");
             if (stockMsg != null && !stockMsg.contains("not found")) {
                 lore.add(ColorUtil.colorize(stockMsg
@@ -158,11 +160,21 @@ public class BlackMarketGUI {
             }
 
             lore.add("");
-            String clickMsg = plugin.getMessageManager().getMessage("gui.item.click-to-buy");
-            if (clickMsg != null && !clickMsg.contains("not found")) {
-                lore.add(ColorUtil.colorize(clickMsg));
+
+            if (isOutOfStock) {
+                String outOfStockMsg = plugin.getMessageManager().getMessage("gui.item.out-of-stock");
+                if (outOfStockMsg != null && !outOfStockMsg.contains("not found")) {
+                    lore.add(ColorUtil.colorize(outOfStockMsg));
+                } else {
+                    lore.add(ColorUtil.colorize("&c&lOut of Stock!"));
+                }
             } else {
-                lore.add(ColorUtil.colorize("&a&lClick to purchase!"));
+                String clickMsg = plugin.getMessageManager().getMessage("gui.item.click-to-buy");
+                if (clickMsg != null && !clickMsg.contains("not found")) {
+                    lore.add(ColorUtil.colorize(clickMsg));
+                } else {
+                    lore.add(ColorUtil.colorize("&a&lClick to purchase!"));
+                }
             }
 
             meta.setLore(lore);

@@ -20,6 +20,7 @@ gui:
     price-discounted: "&6Discounted: &a${price}"
     stock: "&7Stock: &f{stock}/{max}"
     click-to-buy: "&gradient:#00FF00:#00FFFF>&l➤ Click to purchase!"
+    out-of-stock: "&gradient:#FF0000:#8B0000>&l✖ Out of Stock!"
 
 purchase:
   success: "&gradient:#00FF00:#00FFFF>&l[BLACK MARKET] &aSuccessfully purchased {item} &afor &e${price}!"

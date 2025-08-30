@@ -7,6 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ConfigManager {
@@ -40,6 +41,10 @@ public class ConfigManager {
         config.set("settings.discount-chance", 0.25);
         config.set("settings.discount-min", 0.10);
         config.set("settings.discount-max", 0.50);
+
+        config.set("settings.schedule-mode", "minecraft-night");
+        config.set("settings.timezone", "UTC");
+        config.set("settings.open-hours", Arrays.asList("20:00-23:59", "00:00-02:00"));
 
         config.set("items.diamond_sword.display-name", "&b&lDiamond Sword");
         config.set("items.diamond_sword.material", "DIAMOND_SWORD");

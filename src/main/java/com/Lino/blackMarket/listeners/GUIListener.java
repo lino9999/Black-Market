@@ -6,6 +6,7 @@ import com.Lino.blackMarket.utils.ColorUtil;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -93,6 +94,7 @@ public class GUIListener implements Listener {
             } else {
                 player.sendMessage(ColorUtil.colorize("&cThis item is out of stock!"));
             }
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.8f, 0.9f);
             player.closeInventory();
             return;
         }
@@ -106,6 +108,7 @@ public class GUIListener implements Listener {
             } else {
                 player.sendMessage(ColorUtil.colorize("&cYou need &e$" + String.format("%.2f", price) + " &cto purchase this item!"));
             }
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.8f, 0.8f);
             return;
         }
 
@@ -116,6 +119,7 @@ public class GUIListener implements Listener {
             } else {
                 player.sendMessage(ColorUtil.colorize("&cAn error occurred during purchase!"));
             }
+            player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 0.8f);
             return;
         }
 
@@ -134,6 +138,9 @@ public class GUIListener implements Listener {
         } else {
             player.sendMessage(ColorUtil.colorize("&aSuccessfully purchased " + item.getDisplayName() + " &afor &e$" + String.format("%.2f", price)));
         }
+
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.2f);
+        player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.6f, 0.8f);
 
         player.closeInventory();
     }

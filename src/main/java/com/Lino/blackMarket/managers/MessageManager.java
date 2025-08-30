@@ -61,6 +61,7 @@ public class MessageManager {
         messagesConfig.set("gui.item.price-discounted", "&6Discounted: &a${price}");
         messagesConfig.set("gui.item.stock", "&7Stock: &f{stock}/{max}");
         messagesConfig.set("gui.item.click-to-buy", "&gradient:#00FF00:#00FFFF>&l➤ Click to purchase!");
+        messagesConfig.set("gui.item.out-of-stock", "&gradient:#FF0000:#8B0000>&l✖ Out of Stock!");
 
         messagesConfig.set("purchase.success", "&gradient:#00FF00:#00FFFF>&l[BLACK MARKET] &aSuccessfully purchased {item} &afor &e${price}!");
         messagesConfig.set("purchase.insufficient-funds", "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cYou need &e${price} &cto purchase this item!");
