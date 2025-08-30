@@ -55,13 +55,21 @@ public class BlackMarketManager {
     private void openMarket() {
         isOpen = true;
         String openMessage = plugin.getMessageManager().getMessage("market.open");
-        Bukkit.broadcastMessage(ColorUtil.colorize(openMessage));
+        if (openMessage != null && !openMessage.contains("not found")) {
+            Bukkit.broadcastMessage(ColorUtil.colorize(openMessage));
+        } else {
+            Bukkit.broadcastMessage(ColorUtil.colorize("&a&l[BLACK MARKET] &fThe Black Market is now OPEN!"));
+        }
     }
 
     private void closeMarket() {
         isOpen = false;
         String closeMessage = plugin.getMessageManager().getMessage("market.close");
-        Bukkit.broadcastMessage(ColorUtil.colorize(closeMessage));
+        if (closeMessage != null && !closeMessage.contains("not found")) {
+            Bukkit.broadcastMessage(ColorUtil.colorize(closeMessage));
+        } else {
+            Bukkit.broadcastMessage(ColorUtil.colorize("&c&l[BLACK MARKET] &fThe Black Market is now CLOSED!"));
+        }
     }
 
     private long getDayNumber() {

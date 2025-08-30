@@ -87,7 +87,12 @@ public class GUIListener implements Listener {
         int remainingStock = plugin.getBlackMarketManager().getRemainingStock(item.getId());
 
         if (remainingStock <= 0) {
-            player.sendMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("purchase.out-of-stock")));
+            String msg = plugin.getMessageManager().getMessage("purchase.out-of-stock");
+            if (msg != null && !msg.contains("not found")) {
+                player.sendMessage(ColorUtil.colorize(msg));
+            } else {
+                player.sendMessage(ColorUtil.colorize("&cThis item is out of stock!"));
+            }
             player.closeInventory();
             return;
         }
@@ -95,13 +100,22 @@ public class GUIListener implements Listener {
         double price = item.hasDiscount() ? item.getDiscountedPrice() : item.getPrice();
 
         if (!economy.has(player, price)) {
-            player.sendMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("purchase.insufficient-funds")
-                    .replace("{price}", String.format("%.2f", price))));
+            String msg = plugin.getMessageManager().getMessage("purchase.insufficient-funds");
+            if (msg != null && !msg.contains("not found")) {
+                player.sendMessage(ColorUtil.colorize(msg.replace("{price}", String.format("%.2f", price))));
+            } else {
+                player.sendMessage(ColorUtil.colorize("&cYou need &e$" + String.format("%.2f", price) + " &cto purchase this item!"));
+            }
             return;
         }
 
         if (!plugin.getBlackMarketManager().purchaseItem(item.getId(), 1)) {
-            player.sendMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("purchase.error")));
+            String msg = plugin.getMessageManager().getMessage("purchase.error");
+            if (msg != null && !msg.contains("not found")) {
+                player.sendMessage(ColorUtil.colorize(msg));
+            } else {
+                player.sendMessage(ColorUtil.colorize("&cAn error occurred during purchase!"));
+            }
             return;
         }
 
@@ -112,9 +126,14 @@ public class GUIListener implements Listener {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
         }
 
-        player.sendMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("purchase.success")
-                .replace("{item}", item.getDisplayName())
-                .replace("{price}", String.format("%.2f", price))));
+        String msg = plugin.getMessageManager().getMessage("purchase.success");
+        if (msg != null && !msg.contains("not found")) {
+            player.sendMessage(ColorUtil.colorize(msg
+                    .replace("{item}", item.getDisplayName())
+                    .replace("{price}", String.format("%.2f", price))));
+        } else {
+            player.sendMessage(ColorUtil.colorize("&aSuccessfully purchased " + item.getDisplayName() + " &afor &e$" + String.format("%.2f", price)));
+        }
 
         player.closeInventory();
     }

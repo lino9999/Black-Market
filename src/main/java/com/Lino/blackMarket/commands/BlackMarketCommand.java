@@ -52,6 +52,20 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
                 player.sendMessage(ColorUtil.colorize("&aForced open Black Market GUI"));
                 return true;
             }
+
+            if (args[0].equalsIgnoreCase("testcolors") && player.hasPermission("blackmarket.admin")) {
+                player.sendMessage(ColorUtil.colorize("&aTesting color codes:"));
+                player.sendMessage(ColorUtil.colorize("&1Dark Blue &2Dark Green &3Dark Aqua &4Dark Red"));
+                player.sendMessage(ColorUtil.colorize("&5Purple &6Gold &7Gray &8Dark Gray"));
+                player.sendMessage(ColorUtil.colorize("&9Blue &aGreen &bAqua &cRed"));
+                player.sendMessage(ColorUtil.colorize("&dPink &eYellow &fWhite"));
+                player.sendMessage(ColorUtil.colorize("&l&6Bold Gold &r&o&bItalic Aqua"));
+                player.sendMessage(ColorUtil.colorize("&#FF0080Hex Color Test"));
+                player.sendMessage(ColorUtil.colorize("&gradient:#FF0000:#00FF00>Red to Green Gradient"));
+                player.sendMessage(ColorUtil.colorize("&gradient:#FF0080:#8000FF>&l[BLACK MARKET]"));
+                player.sendMessage(ColorUtil.colorize("&gradient:#FFD700:#FF0000>Gold to Red Gradient Test"));
+                return true;
+            }
         }
 
         if (!plugin.getBlackMarketManager().isOpen()) {
@@ -75,6 +89,9 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
             }
             if ("forceopen".startsWith(args[0].toLowerCase())) {
                 completions.add("forceopen");
+            }
+            if ("testcolors".startsWith(args[0].toLowerCase())) {
+                completions.add("testcolors");
             }
         }
 

@@ -7,6 +7,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MessageManager {
@@ -18,6 +19,7 @@ public class MessageManager {
     public MessageManager(BlackMarket plugin) {
         this.plugin = plugin;
         createMessagesFile();
+        plugin.getLogger().info("Messages file loaded from: " + messagesFile.getAbsolutePath());
     }
 
     private void createMessagesFile() {
@@ -27,13 +29,14 @@ public class MessageManager {
             messagesFile.getParentFile().mkdirs();
             try {
                 messagesFile.createNewFile();
+                messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
                 setDefaultMessages();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
         }
-
-        messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
     }
 
     private void setDefaultMessages() {
@@ -42,14 +45,15 @@ public class MessageManager {
 
         messagesConfig.set("gui.title", "&gradient:#FF0080:#8000FF>&lBLACK MARKET");
         messagesConfig.set("gui.info.title", "&gradient:#FFD700:#FFA500>&lMarket Information");
-        List<String> infoLore = new ArrayList<>();
-        infoLore.add("&7Welcome to the Black Market!");
-        infoLore.add("&7");
-        infoLore.add("&6Your Balance: &e${balance}");
-        infoLore.add("&7");
-        infoLore.add("&7Items refresh daily");
-        infoLore.add("&7Limited stock available!");
-        messagesConfig.set("gui.info.lore", infoLore);
+
+        messagesConfig.set("gui.info.lore", Arrays.asList(
+                "&7Welcome to the Black Market!",
+                "&7",
+                "&6Your Balance: &e${balance}",
+                "&7",
+                "&7Items refresh daily",
+                "&7Limited stock available!"
+        ));
 
         messagesConfig.set("gui.item.discount", "&gradient:#00FF00:#FFFF00>&l[-{percent}%]");
         messagesConfig.set("gui.item.price", "&6Price: &e${price}");
@@ -75,17 +79,39 @@ public class MessageManager {
     }
 
     public String getMessage(String path) {
-        return messagesConfig.getString(path, "&cMessage not found: " + path);
+        if (messagesConfig == null) {
+            return "&cConfiguration error!";
+        }
+
+        String message = messagesConfig.getString(path);
+        if (message == null) {
+            plugin.getLogger().warning("Message not found: " + path);
+            return "&cMessage not found: " + path;
+        }
+
+        return message;
     }
 
     public List<String> getMessageList(String path) {
-        return messagesConfig.getStringList(path);
+        if (messagesConfig == null) {
+            return new ArrayList<>();
+        }
+
+        List<String> list = messagesConfig.getStringList(path);
+        if (list == null || list.isEmpty()) {
+            plugin.getLogger().warning("Message list not found or empty: " + path);
+            return new ArrayList<>();
+        }
+
+        return list;
     }
 
     private void saveMessages() {
         try {
             messagesConfig.save(messagesFile);
+            plugin.getLogger().info("Messages saved successfully to " + messagesFile.getName());
         } catch (IOException e) {
+            plugin.getLogger().severe("Failed to save messages file!");
             e.printStackTrace();
         }
     }

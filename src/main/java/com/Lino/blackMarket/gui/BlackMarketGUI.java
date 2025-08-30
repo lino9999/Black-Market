@@ -103,8 +103,13 @@ public class BlackMarketGUI {
             String displayName = ColorUtil.colorize(bmItem.getDisplayName());
 
             if (bmItem.hasDiscount()) {
-                displayName += ColorUtil.colorize(" " + plugin.getMessageManager().getMessage("gui.item.discount")
-                        .replace("{percent}", String.valueOf(bmItem.getDiscountPercentage())));
+                String discountText = plugin.getMessageManager().getMessage("gui.item.discount");
+                if (discountText != null && !discountText.contains("not found")) {
+                    displayName += ColorUtil.colorize(" " + discountText
+                            .replace("{percent}", String.valueOf(bmItem.getDiscountPercentage())));
+                } else {
+                    displayName += ColorUtil.colorize(" &a[-" + bmItem.getDiscountPercentage() + "%]");
+                }
             }
 
             meta.setDisplayName(displayName);
@@ -117,22 +122,48 @@ public class BlackMarketGUI {
             lore.add("");
 
             if (bmItem.hasDiscount()) {
-                lore.add(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.item.price-original")
-                        .replace("{price}", priceFormat.format(bmItem.getPrice()))));
-                lore.add(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.item.price-discounted")
-                        .replace("{price}", priceFormat.format(bmItem.getDiscountedPrice()))));
+                String originalPrice = plugin.getMessageManager().getMessage("gui.item.price-original");
+                if (originalPrice != null && !originalPrice.contains("not found")) {
+                    lore.add(ColorUtil.colorize(originalPrice
+                            .replace("{price}", priceFormat.format(bmItem.getPrice()))));
+                } else {
+                    lore.add(ColorUtil.colorize("&6Price: &c&m$" + priceFormat.format(bmItem.getPrice())));
+                }
+
+                String discountedPrice = plugin.getMessageManager().getMessage("gui.item.price-discounted");
+                if (discountedPrice != null && !discountedPrice.contains("not found")) {
+                    lore.add(ColorUtil.colorize(discountedPrice
+                            .replace("{price}", priceFormat.format(bmItem.getDiscountedPrice()))));
+                } else {
+                    lore.add(ColorUtil.colorize("&6Discounted: &a$" + priceFormat.format(bmItem.getDiscountedPrice())));
+                }
             } else {
-                lore.add(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.item.price")
-                        .replace("{price}", priceFormat.format(bmItem.getPrice()))));
+                String price = plugin.getMessageManager().getMessage("gui.item.price");
+                if (price != null && !price.contains("not found")) {
+                    lore.add(ColorUtil.colorize(price
+                            .replace("{price}", priceFormat.format(bmItem.getPrice()))));
+                } else {
+                    lore.add(ColorUtil.colorize("&6Price: &e$" + priceFormat.format(bmItem.getPrice())));
+                }
             }
 
             int remainingStock = plugin.getBlackMarketManager().getRemainingStock(bmItem.getId());
-            lore.add(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.item.stock")
-                    .replace("{stock}", String.valueOf(remainingStock))
-                    .replace("{max}", String.valueOf(bmItem.getStock()))));
+            String stockMsg = plugin.getMessageManager().getMessage("gui.item.stock");
+            if (stockMsg != null && !stockMsg.contains("not found")) {
+                lore.add(ColorUtil.colorize(stockMsg
+                        .replace("{stock}", String.valueOf(remainingStock))
+                        .replace("{max}", String.valueOf(bmItem.getStock()))));
+            } else {
+                lore.add(ColorUtil.colorize("&7Stock: &f" + remainingStock + "/" + bmItem.getStock()));
+            }
 
             lore.add("");
-            lore.add(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.item.click-to-buy")));
+            String clickMsg = plugin.getMessageManager().getMessage("gui.item.click-to-buy");
+            if (clickMsg != null && !clickMsg.contains("not found")) {
+                lore.add(ColorUtil.colorize(clickMsg));
+            } else {
+                lore.add(ColorUtil.colorize("&a&lClick to purchase!"));
+            }
 
             meta.setLore(lore);
             item.setItemMeta(meta);
