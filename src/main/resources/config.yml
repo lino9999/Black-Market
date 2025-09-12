@@ -108,7 +108,7 @@ items:
     commands:
       - "give {player} dragon_egg 1"
 
-  custom_item_example:
+  target:
     display-name: "&gradient:#00FF00:#32CD32>&lCustom Plugin Item"
     material: NETHER_STAR
     price: 25000.0

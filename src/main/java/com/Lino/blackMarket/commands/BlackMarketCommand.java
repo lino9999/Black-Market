@@ -87,10 +87,6 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
 
             player.sendMessage(ColorUtil.colorize(closedMsg));
 
-            if (player.hasPermission("blackmarket.admin")) {
-                player.sendMessage(ColorUtil.colorize("&7Tip: Use &e/" + label + " forceopen &7to test the shop"));
-            }
-
             return true;
         }
 
@@ -109,7 +105,7 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(ColorUtil.colorize("&e/" + label + " &7- Open the Black Market"));
             sender.sendMessage(ColorUtil.colorize("&e/" + label + " help &7- Show this help message"));
 
-            if (sender.hasPermission("blackmarket.admin")) {
+            if (sender.hasPermission("blackmarket.admin") && sender.isOp()) {
                 sender.sendMessage(ColorUtil.colorize("&e/" + label + " reload &7- Reload configuration"));
                 sender.sendMessage(ColorUtil.colorize("&e/" + label + " forceopen &7- Force open the market"));
             }
@@ -119,7 +115,7 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
         } else {
             for (String line : helpMessages) {
                 if (line.contains("{admin}")) {
-                    if (sender.hasPermission("blackmarket.admin")) {
+                    if (sender.hasPermission("blackmarket.admin") && sender.isOp()) {
                         sender.sendMessage(ColorUtil.colorize(line.replace("{admin}", "")));
                     }
                 } else {
