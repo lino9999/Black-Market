@@ -20,18 +20,23 @@ public final class BlackMarket extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
-        if (!setupEconomy()) {
-            getLogger().severe("Vault economy not found! Disabling plugin.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
         saveDefaultConfig();
         if (!getDataFolder().exists()) {
             getDataFolder().mkdirs();
         }
 
         configManager = new ConfigManager(this);
+
+        boolean useLevels = getConfig().getBoolean("settings.use-levels", false);
+
+        if (!useLevels) {
+            if (!setupEconomy()) {
+                getLogger().severe("Vault economy not found! Disabling plugin or enable use-levels in config.");
+                getServer().getPluginManager().disablePlugin(this);
+                return;
+            }
+        }
+
         messageManager = new MessageManager(this);
         databaseManager = new DatabaseManager(this);
         blackMarketManager = new BlackMarketManager(this);
@@ -49,6 +54,11 @@ public final class BlackMarket extends JavaPlugin {
         blackMarketManager.startScheduler();
 
         getLogger().info("Black Market plugin has been enabled!");
+        if (useLevels) {
+            getLogger().info("Using experience levels as currency");
+        } else {
+            getLogger().info("Using Vault economy as currency");
+        }
     }
 
     @Override
@@ -95,5 +105,9 @@ public final class BlackMarket extends JavaPlugin {
 
     public BlackMarketManager getBlackMarketManager() {
         return blackMarketManager;
+    }
+
+    public boolean useLevels() {
+        return getConfig().getBoolean("settings.use-levels", false);
     }
 }

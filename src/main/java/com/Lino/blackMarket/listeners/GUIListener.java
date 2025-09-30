@@ -83,8 +83,6 @@ public class GUIListener implements Listener {
     }
 
     private void processPurchase(Player player, BlackMarketItem item) {
-        Economy economy = plugin.getEconomy();
-
         int remainingStock = plugin.getBlackMarketManager().getRemainingStock(item.getId());
 
         if (remainingStock <= 0) {
@@ -100,43 +98,92 @@ public class GUIListener implements Listener {
         }
 
         double price = item.hasDiscount() ? item.getDiscountedPrice() : item.getPrice();
+        boolean useLevels = plugin.useLevels();
 
-        if (!economy.has(player, price)) {
-            String msg = plugin.getMessageManager().getMessage("purchase.insufficient-funds");
-            if (msg != null && !msg.contains("not found")) {
-                player.sendMessage(ColorUtil.colorize(msg.replace("{price}", String.format("%.2f", price))));
-            } else {
-                player.sendMessage(ColorUtil.colorize("&cYou need &e$" + String.format("%.2f", price) + " &cto purchase this item!"));
+        if (useLevels) {
+            int levelPrice = (int) price;
+            int playerLevels = player.getLevel();
+
+            if (playerLevels < levelPrice) {
+                String msg = plugin.getMessageManager().getMessage("purchase.insufficient-levels");
+                if (msg != null && !msg.contains("not found")) {
+                    player.sendMessage(ColorUtil.colorize(msg
+                            .replace("{price}", String.valueOf(levelPrice))
+                            .replace("{current}", String.valueOf(playerLevels))));
+                } else {
+                    player.sendMessage(ColorUtil.colorize("&cYou need &e" + levelPrice + " levels &cto purchase this item! You have &e" + playerLevels + " levels"));
+                }
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.8f, 0.8f);
+                return;
             }
-            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.8f, 0.8f);
-            return;
-        }
 
-        if (!plugin.getBlackMarketManager().purchaseItem(item.getId(), 1)) {
-            String msg = plugin.getMessageManager().getMessage("purchase.error");
-            if (msg != null && !msg.contains("not found")) {
-                player.sendMessage(ColorUtil.colorize(msg));
-            } else {
-                player.sendMessage(ColorUtil.colorize("&cAn error occurred during purchase!"));
+            if (!plugin.getBlackMarketManager().purchaseItem(item.getId(), 1)) {
+                String msg = plugin.getMessageManager().getMessage("purchase.error");
+                if (msg != null && !msg.contains("not found")) {
+                    player.sendMessage(ColorUtil.colorize(msg));
+                } else {
+                    player.sendMessage(ColorUtil.colorize("&cAn error occurred during purchase!"));
+                }
+                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 0.8f);
+                return;
             }
-            player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 0.8f);
-            return;
-        }
 
-        economy.withdrawPlayer(player, price);
+            player.setLevel(playerLevels - levelPrice);
 
-        for (String command : item.getCommands()) {
-            String finalCommand = command.replace("{player}", player.getName());
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
-        }
+            for (String command : item.getCommands()) {
+                String finalCommand = command.replace("{player}", player.getName());
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
+            }
 
-        String msg = plugin.getMessageManager().getMessage("purchase.success");
-        if (msg != null && !msg.contains("not found")) {
-            player.sendMessage(ColorUtil.colorize(msg
-                    .replace("{item}", item.getDisplayName())
-                    .replace("{price}", String.format("%.2f", price))));
+            String msg = plugin.getMessageManager().getMessage("purchase.success-levels");
+            if (msg != null && !msg.contains("not found")) {
+                player.sendMessage(ColorUtil.colorize(msg
+                        .replace("{item}", item.getDisplayName())
+                        .replace("{price}", String.valueOf(levelPrice))));
+            } else {
+                player.sendMessage(ColorUtil.colorize("&aSuccessfully purchased " + item.getDisplayName() + " &afor &e" + levelPrice + " levels"));
+            }
+
         } else {
-            player.sendMessage(ColorUtil.colorize("&aSuccessfully purchased " + item.getDisplayName() + " &afor &e$" + String.format("%.2f", price)));
+            Economy economy = plugin.getEconomy();
+
+            if (!economy.has(player, price)) {
+                String msg = plugin.getMessageManager().getMessage("purchase.insufficient-funds");
+                if (msg != null && !msg.contains("not found")) {
+                    player.sendMessage(ColorUtil.colorize(msg.replace("{price}", String.format("%.2f", price))));
+                } else {
+                    player.sendMessage(ColorUtil.colorize("&cYou need &e$" + String.format("%.2f", price) + " &cto purchase this item!"));
+                }
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.8f, 0.8f);
+                return;
+            }
+
+            if (!plugin.getBlackMarketManager().purchaseItem(item.getId(), 1)) {
+                String msg = plugin.getMessageManager().getMessage("purchase.error");
+                if (msg != null && !msg.contains("not found")) {
+                    player.sendMessage(ColorUtil.colorize(msg));
+                } else {
+                    player.sendMessage(ColorUtil.colorize("&cAn error occurred during purchase!"));
+                }
+                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 0.8f);
+                return;
+            }
+
+            economy.withdrawPlayer(player, price);
+
+            for (String command : item.getCommands()) {
+                String finalCommand = command.replace("{player}", player.getName());
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
+            }
+
+            String msg = plugin.getMessageManager().getMessage("purchase.success");
+            if (msg != null && !msg.contains("not found")) {
+                player.sendMessage(ColorUtil.colorize(msg
+                        .replace("{item}", item.getDisplayName())
+                        .replace("{price}", String.format("%.2f", price))));
+            } else {
+                player.sendMessage(ColorUtil.colorize("&aSuccessfully purchased " + item.getDisplayName() + " &afor &e$" + String.format("%.2f", price)));
+            }
         }
 
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.2f);

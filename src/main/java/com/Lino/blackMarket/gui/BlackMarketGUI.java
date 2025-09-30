@@ -20,6 +20,7 @@ public class BlackMarketGUI {
     private final Player player;
     private final Inventory inventory;
     private final DecimalFormat priceFormat = new DecimalFormat("#,##0.00");
+    private final DecimalFormat levelFormat = new DecimalFormat("#,##0");
 
     public BlackMarketGUI(BlackMarket plugin, Player player) {
         this.plugin = plugin;
@@ -70,9 +71,15 @@ public class BlackMarketGUI {
             meta.setDisplayName(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.info.title")));
 
             List<String> lore = new ArrayList<>();
+            boolean useLevels = plugin.useLevels();
+
             for (String line : plugin.getMessageManager().getMessageList("gui.info.lore")) {
-                lore.add(ColorUtil.colorize(line.replace("{balance}",
-                        priceFormat.format(plugin.getEconomy().getBalance(player)))));
+                if (useLevels) {
+                    line = line.replace("{balance}", levelFormat.format(player.getLevel()) + " levels");
+                } else {
+                    line = line.replace("{balance}", priceFormat.format(plugin.getEconomy().getBalance(player)));
+                }
+                lore.add(ColorUtil.colorize(line));
             }
             meta.setLore(lore);
             item.setItemMeta(meta);
@@ -123,30 +130,49 @@ public class BlackMarketGUI {
 
             int remainingStock = plugin.getBlackMarketManager().getRemainingStock(bmItem.getId());
             boolean isOutOfStock = remainingStock <= 0;
+            boolean useLevels = plugin.useLevels();
 
             if (bmItem.hasDiscount()) {
                 String originalPrice = plugin.getMessageManager().getMessage("gui.item.price-original");
                 if (originalPrice != null && !originalPrice.contains("not found")) {
+                    String priceText = useLevels ?
+                            levelFormat.format((int)bmItem.getPrice()) + " levels" :
+                            "$" + priceFormat.format(bmItem.getPrice());
                     lore.add(ColorUtil.colorize(originalPrice
-                            .replace("{price}", priceFormat.format(bmItem.getPrice()))));
+                            .replace("{price}", priceText)));
                 } else {
-                    lore.add(ColorUtil.colorize("&6Price: &c&m$" + priceFormat.format(bmItem.getPrice())));
+                    String priceText = useLevels ?
+                            levelFormat.format((int)bmItem.getPrice()) + " levels" :
+                            "$" + priceFormat.format(bmItem.getPrice());
+                    lore.add(ColorUtil.colorize("&6Price: &c&m" + priceText));
                 }
 
                 String discountedPrice = plugin.getMessageManager().getMessage("gui.item.price-discounted");
                 if (discountedPrice != null && !discountedPrice.contains("not found")) {
+                    String priceText = useLevels ?
+                            levelFormat.format((int)bmItem.getDiscountedPrice()) + " levels" :
+                            "$" + priceFormat.format(bmItem.getDiscountedPrice());
                     lore.add(ColorUtil.colorize(discountedPrice
-                            .replace("{price}", priceFormat.format(bmItem.getDiscountedPrice()))));
+                            .replace("{price}", priceText)));
                 } else {
-                    lore.add(ColorUtil.colorize("&6Discounted: &a$" + priceFormat.format(bmItem.getDiscountedPrice())));
+                    String priceText = useLevels ?
+                            levelFormat.format((int)bmItem.getDiscountedPrice()) + " levels" :
+                            "$" + priceFormat.format(bmItem.getDiscountedPrice());
+                    lore.add(ColorUtil.colorize("&6Discounted: &a" + priceText));
                 }
             } else {
                 String price = plugin.getMessageManager().getMessage("gui.item.price");
                 if (price != null && !price.contains("not found")) {
+                    String priceText = useLevels ?
+                            levelFormat.format((int)bmItem.getPrice()) + " levels" :
+                            "$" + priceFormat.format(bmItem.getPrice());
                     lore.add(ColorUtil.colorize(price
-                            .replace("{price}", priceFormat.format(bmItem.getPrice()))));
+                            .replace("{price}", priceText)));
                 } else {
-                    lore.add(ColorUtil.colorize("&6Price: &e$" + priceFormat.format(bmItem.getPrice())));
+                    String priceText = useLevels ?
+                            levelFormat.format((int)bmItem.getPrice()) + " levels" :
+                            "$" + priceFormat.format(bmItem.getPrice());
+                    lore.add(ColorUtil.colorize("&6Price: &e" + priceText));
                 }
             }
 

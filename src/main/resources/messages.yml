@@ -9,22 +9,24 @@ gui:
     lore:
       - "&7Welcome to the Black Market!"
       - "&7"
-      - "&6Your Balance: &e${balance}"
+      - "&6Your Balance: &e{balance}"
       - "&7"
       - "&7Items refresh daily"
       - "&7Limited stock available!"
   item:
     discount: "&gradient:#00FF00:#FFFF00>&l[-{percent}%]"
-    price: "&6Price: &e${price}"
-    price-original: "&6Price: &c&m${price}"
-    price-discounted: "&6Discounted: &a${price}"
+    price: "&6Price: &e{price}"
+    price-original: "&6Price: &c&m{price}"
+    price-discounted: "&6Discounted: &a{price}"
     stock: "&7Stock: &f{stock}/{max}"
     click-to-buy: "&gradient:#00FF00:#00FFFF>&l➤ Click to purchase!"
     out-of-stock: "&gradient:#FF0000:#8B0000>&l✖ Out of Stock!"
 
 purchase:
   success: "&gradient:#00FF00:#00FFFF>&l[BLACK MARKET] &aSuccessfully purchased {item} &afor &e${price}!"
+  success-levels: "&gradient:#00FF00:#00FFFF>&l[BLACK MARKET] &aSuccessfully purchased {item} &afor &e{price} levels!"
   insufficient-funds: "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cYou need &e${price} &cto purchase this item!"
+  insufficient-levels: "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cYou need &e{price} levels &cto purchase this item! You have &e{current} levels"
   out-of-stock: "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cThis item is out of stock!"
   error: "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cAn error occurred during purchase!"
 

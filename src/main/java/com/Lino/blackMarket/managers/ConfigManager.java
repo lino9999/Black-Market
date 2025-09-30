@@ -37,6 +37,7 @@ public class ConfigManager {
     }
 
     private void setDefaults() {
+        config.set("settings.use-levels", false);
         config.set("settings.max-items-per-day", 9);
         config.set("settings.discount-chance", 0.25);
         config.set("settings.discount-min", 0.10);
@@ -48,7 +49,7 @@ public class ConfigManager {
 
         config.set("items.diamond_sword.display-name", "&b&lDiamond Sword");
         config.set("items.diamond_sword.material", "DIAMOND_SWORD");
-        config.set("items.diamond_sword.price", 1500.0);
+        config.set("items.diamond_sword.price", 15);
         config.set("items.diamond_sword.stock", 3);
         List<String> lore = new ArrayList<>();
         lore.add("&7A powerful weapon");
@@ -60,7 +61,7 @@ public class ConfigManager {
 
         config.set("items.god_apple.display-name", "&6&lEnchanted Golden Apple");
         config.set("items.god_apple.material", "ENCHANTED_GOLDEN_APPLE");
-        config.set("items.god_apple.price", 5000.0);
+        config.set("items.god_apple.price", 30);
         config.set("items.god_apple.stock", 1);
         lore = new ArrayList<>();
         lore.add("&7The ultimate healing item");
