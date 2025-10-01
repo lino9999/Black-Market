@@ -12,7 +12,12 @@ import org.bukkit.scheduler.BukkitTask;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class BlackMarketManager {
 
@@ -33,7 +38,6 @@ public class BlackMarketManager {
 
     public void startScheduler() {
         String scheduleMode = plugin.getConfig().getString("settings.schedule-mode", "minecraft-night");
-
         if (scheduleMode.equalsIgnoreCase("minecraft-night")) {
             startMinecraftScheduler();
         } else if (scheduleMode.equalsIgnoreCase("real-time")) {
@@ -144,7 +148,6 @@ public class BlackMarketManager {
 
     private long getDayNumber() {
         String scheduleMode = plugin.getConfig().getString("settings.schedule-mode", "minecraft-night");
-
         if (scheduleMode.equalsIgnoreCase("minecraft-night")) {
             World world = Bukkit.getWorlds().get(0);
             return world.getFullTime() / 24000L;
@@ -204,7 +207,6 @@ public class BlackMarketManager {
 
         int purchased = purchasedStocks.getOrDefault(itemId, 0);
         int remaining = item.getStock() - purchased;
-
         if (remaining < amount) return false;
 
         purchasedStocks.put(itemId, purchased + amount);

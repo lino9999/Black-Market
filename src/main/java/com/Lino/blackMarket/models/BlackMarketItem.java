@@ -13,17 +13,19 @@ public class BlackMarketItem {
     private final Material material;
     private final List<String> lore;
     private final double price;
+    private final int expPrice;
     private final int stock;
     private final List<String> commands;
     private double discount = 0.0;
 
     public BlackMarketItem(String id, String displayName, Material material, List<String> lore,
-                           double price, int stock, List<String> commands) {
+                           double price, int expPrice, int stock, List<String> commands) {
         this.id = id;
         this.displayName = displayName;
         this.material = material;
         this.lore = lore;
         this.price = price;
+        this.expPrice = expPrice;
         this.stock = stock;
         this.commands = commands;
     }
@@ -59,8 +61,16 @@ public class BlackMarketItem {
         return price;
     }
 
+    public int getExpPrice() {
+        return expPrice;
+    }
+
     public double getDiscountedPrice() {
         return price * (1 - discount);
+    }
+
+    public int getDiscountedExpPrice() {
+        return (int) (expPrice * (1 - discount));
     }
 
     public int getStock() {

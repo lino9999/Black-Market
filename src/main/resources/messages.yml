@@ -1,51 +1,48 @@
 market:
-  open: "&gradient:#FF0080:#8000FF>&l[BLACK MARKET] &fThe shadows stir... The Black Market has opened its doors for the night!"
-  close: "&gradient:#8000FF:#FF0080>&l[BLACK MARKET] &fDawn breaks... The Black Market vanishes into the shadows until nightfall."
-
+  open: '<gradient:#FF0080:#8000FF>&l[BLACK MARKET]</gradient> <gradient:#FFFFFF:#E0E0E0>The shadows stir... The Black Market has opened its doors for the night!</gradient>'
+  close: '<gradient:#8000FF:#FF0080>&l[BLACK MARKET]</gradient> <gradient:#FFFFFF:#E0E0E0>Dawn breaks... The Black Market vanishes into the shadows until nightfall.</gradient>'
 gui:
-  title: "&gradient:#FF0080:#8000FF>&lBLACK MARKET"
+  title: '<gradient:#FF0080:#8000FF>&lBLACK MARKET</gradient>'
   info:
-    title: "&gradient:#FFD700:#FFA500>&lMarket Information"
+    title: '<gradient:#FDC830:#F37335>&lMarket Information</gradient>'
     lore:
-      - "&7Welcome to the Black Market!"
-      - "&7"
-      - "&6Your Balance: &e{balance}"
-      - "&7"
-      - "&7Items refresh daily"
-      - "&7Limited stock available!"
+      - '<gradient:#ECE9E6:#FFFFFF>Welcome to the Black Market!</gradient>'
+      - ''
+      - '<gradient:#FDB813:#F94A29>Your Balance:</gradient> &f{balance}'
+      - ''
+      - '<gradient:#BDBBBE:#9D9D9F>Items refresh daily</gradient>'
+      - '<gradient:#BDBBBE:#9D9D9F>Limited stock available!</gradient>'
   item:
-    discount: "&gradient:#00FF00:#FFFF00>&l[-{percent}%]"
-    price: "&6Price: &e{price}"
-    price-original: "&6Price: &c&m{price}"
-    price-discounted: "&6Discounted: &a{price}"
-    stock: "&7Stock: &f{stock}/{max}"
-    click-to-buy: "&gradient:#00FF00:#00FFFF>&l➤ Click to purchase!"
-    out-of-stock: "&gradient:#FF0000:#8B0000>&l✖ Out of Stock!"
-
+    discount: '<gradient:#00FF00:#FFFF00>&l[-{percent}%]</gradient>'
+    price: '<gradient:#FDB813:#F94A29>Price:</gradient> &f{price}'
+    price-original: '<gradient:#FF416C:#FF4B2B>&mPrice: {price}</gradient>'
+    price-discounted: '<gradient:#11998e:#38ef7d>Discounted:</gradient> &f{price}'
+    stock: '<gradient:#BDBBBE:#9D9D9F>Stock:</gradient> &f{stock}/{max}'
+    click-to-buy: '<gradient:#00FF00:#00FFFF>&l➤ Click to purchase!</gradient>'
+    out-of-stock: '<gradient:#FF0000:#8B0000>&l✖ Out of Stock!</gradient>'
 purchase:
-  success: "&gradient:#00FF00:#00FFFF>&l[BLACK MARKET] &aSuccessfully purchased {item} &afor &e${price}!"
-  success-levels: "&gradient:#00FF00:#00FFFF>&l[BLACK MARKET] &aSuccessfully purchased {item} &afor &e{price} levels!"
-  insufficient-funds: "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cYou need &e${price} &cto purchase this item!"
-  insufficient-levels: "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cYou need &e{price} levels &cto purchase this item! You have &e{current} levels"
-  out-of-stock: "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cThis item is out of stock!"
-  error: "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cAn error occurred during purchase!"
-
+  success: '<gradient:#11998e:#38ef7d>&l[BLACK MARKET]</gradient> &fSuccessfully purchased {item} &ffor &f${price}!'
+  success-levels: '<gradient:#11998e:#38ef7d>&l[BLACK MARKET]</gradient> &fSuccessfully purchased {item} &ffor &f{price} levels!'
+  insufficient-funds: '<gradient:#FF416C:#FF4B2B>&l[BLACK MARKET]</gradient> &cYou need &e${price} &cto purchase this!'
+  insufficient-levels: '<gradient:#FF416C:#FF4B2B>&l[BLACK MARKET]</gradient> &cYou need &e{price} levels &cto purchase this!'
+  out-of-stock: '<gradient:#FF416C:#FF4B2B>&l[BLACK MARKET]</gradient> &cThis item is out of stock!'
+  error: '<gradient:#FF416C:#FF4B2B>&l[BLACK MARKET]</gradient> &cAn error occurred during purchase!'
 command:
-  player-only: "&cThis command can only be used by players!"
-  market-closed: "&gradient:#FF6600:#FFCC00>&l[BLACK MARKET] &cThe Black Market is closed! Come back at night (13000-23000 ticks)."
-  reload: "&gradient:#00FF00:#00FFFF>&l[BLACK MARKET] &aConfiguration and messages reloaded!"
+  player-only: '<gradient:#FF416C:#FF4B2B>This command can only be used by players!</gradient>'
+  market-closed: '<gradient:#FF6600:#FFCC00>&l[BLACK MARKET]</gradient> &cThe Black Market is closed! Come back at night.'
+  reload: '<gradient:#00FF00:#00FFFF>&l[BLACK MARKET]</gradient> &aConfiguration and messages reloaded!'
   help:
-    - "&gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    - "&gradient:#FF0080:#8000FF>&l     BLACK MARKET HELP"
-    - "&gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    - ""
-    - "&6Player Commands:"
-    - "&e/blackmarket &7- Open the Black Market"
-    - "&e/blackmarket help &7- Show this help message"
-    - ""
-    - "&6Admin Commands:{admin}"
-    - "&e/blackmarket reload &7- Reload configuration{admin}"
-    - "&e/blackmarket forceopen &7- Force open the market{admin}"
-    - ""
-    - "&7Aliases: &f/bm, /blackm, /market"
-    - "&gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    - '<gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>'
+    - '   <gradient:#FF0080:#8000FF>&lBLACK MARKET HELP</gradient>'
+    - '<gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>'
+    - ''
+    - '<gradient:#FDC830:#F37335>Player Commands:</gradient>'
+    - '  &e/{label} &7- Open the Black Market'
+    - '  &e/{label} help &7- Show this help message'
+    - ''
+    - '<gradient:#FF416C:#FF4B2B>Admin Commands:{admin}</gradient>'
+    - '  &e/{label} reload &7- Reload configuration{admin}'
+    - '  &e/{label} forceopen &7- Force open the market{admin}'
+    - ''
+    - '&7Aliases: &f/bm, /blackm, /market'
+    - '<gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>'

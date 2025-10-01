@@ -2,7 +2,10 @@ package com.Lino.blackMarket;
 
 import com.Lino.blackMarket.commands.BlackMarketCommand;
 import com.Lino.blackMarket.listeners.GUIListener;
-import com.Lino.blackMarket.managers.*;
+import com.Lino.blackMarket.managers.BlackMarketManager;
+import com.Lino.blackMarket.managers.ConfigManager;
+import com.Lino.blackMarket.managers.DatabaseManager;
+import com.Lino.blackMarket.managers.MessageManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,7 +22,6 @@ public final class BlackMarket extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-
         saveDefaultConfig();
         if (!getDataFolder().exists()) {
             getDataFolder().mkdirs();
@@ -28,7 +30,6 @@ public final class BlackMarket extends JavaPlugin {
         configManager = new ConfigManager(this);
 
         boolean useLevels = getConfig().getBoolean("settings.use-levels", false);
-
         if (!useLevels) {
             if (!setupEconomy()) {
                 getLogger().severe("Vault economy not found! Disabling plugin or enable use-levels in config.");

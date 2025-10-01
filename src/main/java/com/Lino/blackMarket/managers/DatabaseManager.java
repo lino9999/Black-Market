@@ -2,7 +2,12 @@ package com.Lino.blackMarket.managers;
 
 import com.Lino.blackMarket.BlackMarket;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class DatabaseManager {
 
@@ -47,7 +52,6 @@ public class DatabaseManager {
 
     public void savePurchase(String itemId, int amount, long dayNumber) {
         String sql = "INSERT INTO purchases (item_id, amount, day_number) VALUES (?, ?, ?)";
-
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, itemId);
             pstmt.setInt(2, amount);
@@ -60,7 +64,6 @@ public class DatabaseManager {
 
     public int getTodayPurchases(String itemId, long dayNumber) {
         String sql = "SELECT SUM(amount) FROM purchases WHERE item_id = ? AND day_number = ?";
-
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, itemId);
             pstmt.setLong(2, dayNumber);
@@ -78,7 +81,6 @@ public class DatabaseManager {
 
     public void cleanOldPurchases(long daysToKeep) {
         String sql = "DELETE FROM purchases WHERE day_number < ?";
-
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setLong(1, daysToKeep);
             pstmt.executeUpdate();

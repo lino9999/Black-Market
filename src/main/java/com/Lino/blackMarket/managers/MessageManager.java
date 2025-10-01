@@ -19,12 +19,10 @@ public class MessageManager {
     public MessageManager(BlackMarket plugin) {
         this.plugin = plugin;
         createMessagesFile();
-        plugin.getLogger().info("Messages file loaded from: " + messagesFile.getAbsolutePath());
     }
 
     private void createMessagesFile() {
         messagesFile = new File(plugin.getDataFolder(), "messages.yml");
-
         if (!messagesFile.exists()) {
             messagesFile.getParentFile().mkdirs();
             try {
@@ -40,55 +38,55 @@ public class MessageManager {
     }
 
     private void setDefaultMessages() {
-        messagesConfig.set("market.open", "&gradient:#FF0080:#8000FF>&l[BLACK MARKET] &fThe shadows stir... The Black Market has opened its doors for the night!");
-        messagesConfig.set("market.close", "&gradient:#8000FF:#FF0080>&l[BLACK MARKET] &fDawn breaks... The Black Market vanishes into the shadows until nightfall.");
+        messagesConfig.set("market.open", "<gradient:#FF0080:#8000FF>&l[BLACK MARKET]</gradient> &fThe shadows stir... The Black Market has opened its doors for the night!");
+        messagesConfig.set("market.close", "<gradient:#8000FF:#FF0080>&l[BLACK MARKET]</gradient> &fDawn breaks... The Black Market vanishes into the shadows until nightfall.");
 
-        messagesConfig.set("gui.title", "&gradient:#FF0080:#8000FF>&lBLACK MARKET");
-        messagesConfig.set("gui.info.title", "&gradient:#FFD700:#FFA500>&lMarket Information");
-
+        messagesConfig.set("gui.title", "<gradient:#FF0080:#8000FF>&lBLACK MARKET</gradient>");
+        messagesConfig.set("gui.info.title", "<gradient:#FDC830:#F37335>&lMarket Information</gradient>");
         messagesConfig.set("gui.info.lore", Arrays.asList(
-                "&7Welcome to the Black Market!",
-                "&7",
-                "&6Your Balance: &e${balance}",
-                "&7",
-                "&7Items refresh daily",
-                "&7Limited stock available!"
+                "<gradient:#ECE9E6:#FFFFFF>Welcome to the Black Market!</gradient>",
+                "",
+                "<gradient:#FDB813:#F94A29>Your Balance:</gradient> &f{balance}",
+                "",
+                "<gradient:#BDBBBE:#9D9D9F>Items refresh daily</gradient>",
+                "<gradient:#BDBBBE:#9D9D9F>Limited stock available!</gradient>"
         ));
 
-        messagesConfig.set("gui.item.discount", "&gradient:#00FF00:#FFFF00>&l[-{percent}%]");
-        messagesConfig.set("gui.item.price", "&6Price: &e${price}");
-        messagesConfig.set("gui.item.price-original", "&6Price: &c&m${price}");
-        messagesConfig.set("gui.item.price-discounted", "&6Discounted: &a${price}");
-        messagesConfig.set("gui.item.stock", "&7Stock: &f{stock}/{max}");
-        messagesConfig.set("gui.item.click-to-buy", "&gradient:#00FF00:#00FFFF>&l➤ Click to purchase!");
-        messagesConfig.set("gui.item.out-of-stock", "&gradient:#FF0000:#8B0000>&l✖ Out of Stock!");
+        messagesConfig.set("gui.item.discount", "<gradient:#00FF00:#FFFF00>&l[-{percent}%]</gradient>");
+        messagesConfig.set("gui.item.price", "<gradient:#FDB813:#F94A29>Price:</gradient> &f{price}");
+        messagesConfig.set("gui.item.price-original", "<gradient:#FF416C:#FF4B2B>&mPrice: {price}</gradient>");
+        messagesConfig.set("gui.item.price-discounted", "<gradient:#11998e:#38ef7d>Discounted:</gradient> &f{price}");
+        messagesConfig.set("gui.item.stock", "<gradient:#BDBBBE:#9D9D9F>Stock:</gradient> &f{stock}/{max}");
+        messagesConfig.set("gui.item.click-to-buy", "<gradient:#00FF00:#00FFFF>&l➤ Click to purchase!</gradient>");
+        messagesConfig.set("gui.item.out-of-stock", "<gradient:#FF0000:#8B0000>&l✖ Out of Stock!</gradient>");
 
-        messagesConfig.set("purchase.success", "&gradient:#00FF00:#00FFFF>&l[BLACK MARKET] &aSuccessfully purchased {item} &afor &e${price}!");
-        messagesConfig.set("purchase.insufficient-funds", "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cYou need &e${price} &cto purchase this item!");
-        messagesConfig.set("purchase.out-of-stock", "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cThis item is out of stock!");
-        messagesConfig.set("purchase.error", "&gradient:#FF0000:#FF6600>&l[BLACK MARKET] &cAn error occurred during purchase!");
+        messagesConfig.set("purchase.success", "<gradient:#11998e:#38ef7d>&l[BLACK MARKET]</gradient> &fSuccessfully purchased {item} &ffor &f{price}!");
+        messagesConfig.set("purchase.success-levels", "<gradient:#11998e:#38ef7d>&l[BLACK MARKET]</gradient> &fSuccessfully purchased {item} &ffor &f{price} levels!");
+        messagesConfig.set("purchase.insufficient-funds", "<gradient:#FF416C:#FF4B2B>&l[BLACK MARKET]</gradient> &fYou need &f${price} &fto purchase this!");
+        messagesConfig.set("purchase.insufficient-levels", "<gradient:#FF416C:#FF4B2B>&l[BLACK MARKET]</gradient> &fYou need &f{price} levels &fto purchase this!");
+        messagesConfig.set("purchase.out-of-stock", "<gradient:#FF416C:#FF4B2B>&l[BLACK MARKET]</gradient> &fThis item is out of stock!");
+        messagesConfig.set("purchase.error", "<gradient:#FF416C:#FF4B2B>&l[BLACK MARKET]</gradient> &fAn error occurred during purchase!");
 
-        messagesConfig.set("command.player-only", "&cThis command can only be used by players!");
-        messagesConfig.set("command.market-closed", "&gradient:#FF6600:#FFCC00>&l[BLACK MARKET] &cThe Black Market is closed! Come back at night (13000-23000 ticks).");
-        messagesConfig.set("command.reload", "&gradient:#00FF00:#00FFFF>&l[BLACK MARKET] &aConfiguration and messages reloaded!");
+        messagesConfig.set("command.player-only", "<gradient:#FF416C:#FF4B2B>This command can only be used by players!</gradient>");
+        messagesConfig.set("command.market-closed", "<gradient:#FF6600:#FFCC00>&l[BLACK MARKET]</gradient> &fThe Black Market is closed! Come back at night (13000-23000 ticks).");
+        messagesConfig.set("command.reload", "<gradient:#00FF00:#00FFFF>&l[BLACK MARKET]</gradient> &fConfiguration and messages reloaded!");
 
         messagesConfig.set("command.help", Arrays.asList(
-                "&gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-                "&gradient:#FF0080:#8000FF>&l     BLACK MARKET HELP",
-                "&gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+                "<gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>",
+                "   <gradient:#FF0080:#8000FF>&lBLACK MARKET HELP</gradient>",
+                "<gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>",
                 "",
-                "&6Player Commands:",
-                "&e/blackmarket &7- Open the Black Market",
-                "&e/blackmarket help &7- Show this help message",
+                "<gradient:#FDC830:#F37335>Player Commands:</gradient>",
+                "  &e/{label} &7- Open the Black Market",
+                "  &e/{label} help &7- Show this help message",
                 "",
-                "&6Admin Commands:{admin}",
-                "&e/blackmarket reload &7- Reload configuration{admin}",
-                "&e/blackmarket forceopen &7- Force open the market{admin}",
+                "<gradient:#FF416C:#FF4B2B>Admin Commands:{admin}</gradient>",
+                "  &e/{label} reload &7- Reload configuration{admin}",
+                "  &e/{label} forceopen &7- Force open the market{admin}",
                 "",
                 "&7Aliases: &f/bm, /blackm, /market",
-                "&gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                "<gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>"
         ));
-
         saveMessages();
     }
 
@@ -100,13 +98,11 @@ public class MessageManager {
         if (messagesConfig == null) {
             return "&cConfiguration error!";
         }
-
         String message = messagesConfig.getString(path);
         if (message == null) {
             plugin.getLogger().warning("Message not found: " + path);
             return "&cMessage not found: " + path;
         }
-
         return message;
     }
 
@@ -114,20 +110,16 @@ public class MessageManager {
         if (messagesConfig == null) {
             return new ArrayList<>();
         }
-
         List<String> list = messagesConfig.getStringList(path);
         if (list == null || list.isEmpty()) {
-            plugin.getLogger().warning("Message list not found or empty: " + path);
             return new ArrayList<>();
         }
-
         return list;
     }
 
     private void saveMessages() {
         try {
             messagesConfig.save(messagesFile);
-            plugin.getLogger().info("Messages saved successfully to " + messagesFile.getName());
         } catch (IOException e) {
             plugin.getLogger().severe("Failed to save messages file!");
             e.printStackTrace();

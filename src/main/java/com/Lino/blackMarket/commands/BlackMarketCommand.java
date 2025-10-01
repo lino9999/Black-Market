@@ -31,7 +31,7 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
 
             if (args[0].equalsIgnoreCase("reload")) {
                 if (!sender.hasPermission("blackmarket.admin")) {
-                    sender.sendMessage(ColorUtil.colorize("&cYou don't have permission to reload!"));
+                    sender.sendMessage(ColorUtil.colorize("<gradient:#FF416C:#FF4B2B>You don't have permission to reload!</gradient>"));
                     return true;
                 }
                 plugin.getConfigManager().reload();
@@ -47,18 +47,18 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
                 }
 
                 if (!sender.hasPermission("blackmarket.admin")) {
-                    sender.sendMessage(ColorUtil.colorize("&cYou don't have permission to force open!"));
+                    sender.sendMessage(ColorUtil.colorize("<gradient:#FF416C:#FF4B2B>You don't have permission to force open!</gradient>"));
                     return true;
                 }
 
                 Player player = (Player) sender;
                 BlackMarketGUI gui = new BlackMarketGUI(plugin, player);
                 gui.open();
-                player.sendMessage(ColorUtil.colorize("&aForced open Black Market GUI"));
+                player.sendMessage(ColorUtil.colorize("<gradient:#11998e:#38ef7d>Forced open Black Market GUI</gradient>"));
                 return true;
             }
 
-            sender.sendMessage(ColorUtil.colorize("&cUnknown subcommand! Use &e/" + label + " help &cfor available commands."));
+            sender.sendMessage(ColorUtil.colorize("<gradient:#FF416C:#FF4B2B>Unknown subcommand! Use </gradient><gradient:#FDC830:#F37335>/" + label + " help</gradient><gradient:#FF416C:#FF4B2B> for available commands.</gradient>"));
             return true;
         }
 
@@ -68,9 +68,8 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
         }
 
         Player player = (Player) sender;
-
         if (!player.hasPermission("blackmarket.use")) {
-            player.sendMessage(ColorUtil.colorize("&cYou don't have permission to use this command!"));
+            player.sendMessage(ColorUtil.colorize("<gradient:#FF416C:#FF4B2B>You don't have permission to use this command!</gradient>"));
             return true;
         }
 
@@ -86,7 +85,6 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
             }
 
             player.sendMessage(ColorUtil.colorize(closedMsg));
-
             return true;
         }
 
@@ -98,16 +96,14 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
 
     private void showHelp(CommandSender sender, String label) {
         List<String> helpMessages = plugin.getMessageManager().getMessageList("command.help");
-
         if (helpMessages.isEmpty()) {
-            sender.sendMessage(ColorUtil.colorize("&gradient:#FF0080:#8000FF>&l[BLACK MARKET] &fHelp"));
+            sender.sendMessage(ColorUtil.colorize("<gradient:#FF0080:#8000FF>&l[BLACK MARKET]</gradient> &fHelp"));
             sender.sendMessage("");
-            sender.sendMessage(ColorUtil.colorize("&e/" + label + " &7- Open the Black Market"));
-            sender.sendMessage(ColorUtil.colorize("&e/" + label + " help &7- Show this help message"));
-
+            sender.sendMessage(ColorUtil.colorize("<gradient:#FDC830:#F37335>/" + label + "</gradient> &f- Open the Black Market"));
+            sender.sendMessage(ColorUtil.colorize("<gradient:#FDC830:#F37335>/" + label + " help</gradient> &f- Show this help message"));
             if (sender.hasPermission("blackmarket.admin") && sender.isOp()) {
-                sender.sendMessage(ColorUtil.colorize("&e/" + label + " reload &7- Reload configuration"));
-                sender.sendMessage(ColorUtil.colorize("&e/" + label + " forceopen &7- Force open the market"));
+                sender.sendMessage(ColorUtil.colorize("<gradient:#FDC830:#F37335>/" + label + " reload</gradient> &f- Reload configuration"));
+                sender.sendMessage(ColorUtil.colorize("<gradient:#FDC830:#F37335>/" + label + " forceopen</gradient> &f- Force open the market"));
             }
 
             sender.sendMessage("");
@@ -119,7 +115,7 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
                         sender.sendMessage(ColorUtil.colorize(line.replace("{admin}", "")));
                     }
                 } else {
-                    sender.sendMessage(ColorUtil.colorize(line));
+                    sender.sendMessage(ColorUtil.colorize(line.replace("{label}", label)));
                 }
             }
         }
@@ -128,10 +124,8 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
-
         if (args.length == 1) {
             List<String> subCommands = new ArrayList<>();
-
             subCommands.add("help");
 
             if (sender.hasPermission("blackmarket.admin")) {

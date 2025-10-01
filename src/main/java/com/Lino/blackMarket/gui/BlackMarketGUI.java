@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BlackMarketGUI {
 
@@ -25,7 +26,6 @@ public class BlackMarketGUI {
     public BlackMarketGUI(BlackMarket plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
-
         String title = ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.title"));
         this.inventory = Bukkit.createInventory(null, 54, title);
 
@@ -39,7 +39,6 @@ public class BlackMarketGUI {
 
     private void fillBorders() {
         ItemStack border = createBorderItem();
-
         for (int i = 0; i < 9; i++) {
             inventory.setItem(i, border);
             inventory.setItem(45 + i, border);
@@ -58,7 +57,7 @@ public class BlackMarketGUI {
         ItemStack item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ColorUtil.colorize("&8"));
+            meta.setDisplayName(" ");
             item.setItemMeta(meta);
         }
         return item;
@@ -69,17 +68,17 @@ public class BlackMarketGUI {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.setDisplayName(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.info.title")));
-
             List<String> lore = new ArrayList<>();
             boolean useLevels = plugin.useLevels();
 
             for (String line : plugin.getMessageManager().getMessageList("gui.info.lore")) {
+                String balance;
                 if (useLevels) {
-                    line = line.replace("{balance}", levelFormat.format(player.getLevel()) + " levels");
+                    balance = levelFormat.format(player.getLevel()) + " levels";
                 } else {
-                    line = line.replace("{balance}", priceFormat.format(plugin.getEconomy().getBalance(player)));
+                    balance = "$" + priceFormat.format(plugin.getEconomy().getBalance(player));
                 }
-                lore.add(ColorUtil.colorize(line));
+                lore.add(ColorUtil.colorize(line.replace("{balance}", balance)));
             }
             meta.setLore(lore);
             item.setItemMeta(meta);
@@ -89,12 +88,10 @@ public class BlackMarketGUI {
 
     private void displayItems() {
         List<BlackMarketItem> items = plugin.getBlackMarketManager().getTodayItems();
-
         int[] slots = {10, 11, 12, 13, 14, 15, 16,
                 19, 20, 21, 22, 23, 24, 25,
                 28, 29, 30, 31, 32, 33, 34,
                 37, 38, 39, 40, 41, 42, 43};
-
         for (int i = 0; i < Math.min(items.size(), slots.length); i++) {
             BlackMarketItem bmItem = items.get(i);
             ItemStack displayItem = createMarketItem(bmItem);
@@ -108,24 +105,15 @@ public class BlackMarketGUI {
 
         if (meta != null) {
             String displayName = ColorUtil.colorize(bmItem.getDisplayName());
-
             if (bmItem.hasDiscount()) {
                 String discountText = plugin.getMessageManager().getMessage("gui.item.discount");
-                if (discountText != null && !discountText.contains("not found")) {
-                    displayName += ColorUtil.colorize(" " + discountText
-                            .replace("{percent}", String.valueOf(bmItem.getDiscountPercentage())));
-                } else {
-                    displayName += ColorUtil.colorize(" &a[-" + bmItem.getDiscountPercentage() + "%]");
-                }
+                displayName += " " + ColorUtil.colorize(discountText.replace("{percent}", String.valueOf(bmItem.getDiscountPercentage())));
             }
 
             meta.setDisplayName(displayName);
-
-            List<String> lore = new ArrayList<>();
-            for (String line : bmItem.getLore()) {
-                lore.add(ColorUtil.colorize(line));
-            }
-
+            List<String> lore = bmItem.getLore().stream()
+                    .map(ColorUtil::colorize)
+                    .collect(Collectors.toList());
             lore.add("");
 
             int remainingStock = plugin.getBlackMarketManager().getRemainingStock(bmItem.getId());
@@ -133,80 +121,49 @@ public class BlackMarketGUI {
             boolean useLevels = plugin.useLevels();
 
             if (bmItem.hasDiscount()) {
-                String originalPrice = plugin.getMessageManager().getMessage("gui.item.price-original");
-                if (originalPrice != null && !originalPrice.contains("not found")) {
-                    String priceText = useLevels ?
-                            levelFormat.format((int)bmItem.getPrice()) + " levels" :
-                            "$" + priceFormat.format(bmItem.getPrice());
-                    lore.add(ColorUtil.colorize(originalPrice
-                            .replace("{price}", priceText)));
-                } else {
-                    String priceText = useLevels ?
-                            levelFormat.format((int)bmItem.getPrice()) + " levels" :
-                            "$" + priceFormat.format(bmItem.getPrice());
-                    lore.add(ColorUtil.colorize("&6Price: &c&m" + priceText));
-                }
+                String originalPriceTemplate = plugin.getMessageManager().getMessage("gui.item.price-original");
+                String discountedPriceTemplate = plugin.getMessageManager().getMessage("gui.item.price-discounted");
+                String originalPriceText;
+                String discountedPriceText;
 
-                String discountedPrice = plugin.getMessageManager().getMessage("gui.item.price-discounted");
-                if (discountedPrice != null && !discountedPrice.contains("not found")) {
-                    String priceText = useLevels ?
-                            levelFormat.format((int)bmItem.getDiscountedPrice()) + " levels" :
-                            "$" + priceFormat.format(bmItem.getDiscountedPrice());
-                    lore.add(ColorUtil.colorize(discountedPrice
-                            .replace("{price}", priceText)));
+                if (useLevels) {
+                    originalPriceText = levelFormat.format(bmItem.getExpPrice()) + " levels";
+                    discountedPriceText = levelFormat.format(bmItem.getDiscountedExpPrice()) + " levels";
                 } else {
-                    String priceText = useLevels ?
-                            levelFormat.format((int)bmItem.getDiscountedPrice()) + " levels" :
-                            "$" + priceFormat.format(bmItem.getDiscountedPrice());
-                    lore.add(ColorUtil.colorize("&6Discounted: &a" + priceText));
+                    originalPriceText = "$" + priceFormat.format(bmItem.getPrice());
+                    discountedPriceText = "$" + priceFormat.format(bmItem.getDiscountedPrice());
                 }
+                lore.add(ColorUtil.colorize(originalPriceTemplate.replace("{price}", originalPriceText)));
+                lore.add(ColorUtil.colorize(discountedPriceTemplate.replace("{price}", discountedPriceText)));
+
             } else {
-                String price = plugin.getMessageManager().getMessage("gui.item.price");
-                if (price != null && !price.contains("not found")) {
-                    String priceText = useLevels ?
-                            levelFormat.format((int)bmItem.getPrice()) + " levels" :
-                            "$" + priceFormat.format(bmItem.getPrice());
-                    lore.add(ColorUtil.colorize(price
-                            .replace("{price}", priceText)));
+                String priceTemplate = plugin.getMessageManager().getMessage("gui.item.price");
+                String priceText;
+                if (useLevels) {
+                    priceText = levelFormat.format(bmItem.getExpPrice()) + " levels";
                 } else {
-                    String priceText = useLevels ?
-                            levelFormat.format((int)bmItem.getPrice()) + " levels" :
-                            "$" + priceFormat.format(bmItem.getPrice());
-                    lore.add(ColorUtil.colorize("&6Price: &e" + priceText));
+                    priceText = "$" + priceFormat.format(bmItem.getPrice());
                 }
+                lore.add(ColorUtil.colorize(priceTemplate.replace("{price}", priceText)));
             }
 
             String stockMsg = plugin.getMessageManager().getMessage("gui.item.stock");
-            if (stockMsg != null && !stockMsg.contains("not found")) {
-                lore.add(ColorUtil.colorize(stockMsg
-                        .replace("{stock}", String.valueOf(remainingStock))
-                        .replace("{max}", String.valueOf(bmItem.getStock()))));
-            } else {
-                lore.add(ColorUtil.colorize("&7Stock: &f" + remainingStock + "/" + bmItem.getStock()));
-            }
-
+            lore.add(ColorUtil.colorize(stockMsg
+                    .replace("{stock}", String.valueOf(remainingStock))
+                    .replace("{max}", String.valueOf(bmItem.getStock()))));
             lore.add("");
 
             if (isOutOfStock) {
                 String outOfStockMsg = plugin.getMessageManager().getMessage("gui.item.out-of-stock");
-                if (outOfStockMsg != null && !outOfStockMsg.contains("not found")) {
-                    lore.add(ColorUtil.colorize(outOfStockMsg));
-                } else {
-                    lore.add(ColorUtil.colorize("&c&lOut of Stock!"));
-                }
+                lore.add(ColorUtil.colorize(outOfStockMsg));
             } else {
                 String clickMsg = plugin.getMessageManager().getMessage("gui.item.click-to-buy");
-                if (clickMsg != null && !clickMsg.contains("not found")) {
-                    lore.add(ColorUtil.colorize(clickMsg));
-                } else {
-                    lore.add(ColorUtil.colorize("&a&lClick to purchase!"));
-                }
+                lore.add(ColorUtil.colorize(clickMsg));
             }
 
             meta.setLore(lore);
             item.setItemMeta(meta);
         }
-
         return item;
     }
 
