@@ -133,17 +133,6 @@ items:
       - '&7A portable storage solution'
       - '&7for the ambitious adventurer.'
     commands: []
-  nether_star:
-    display-name: '<gradient:#F2F2F2:#8C8C8C>&lNether Star</gradient>'
-    material: NETHER_STAR
-    chance: 5.0
-    price: 10000.0
-    exp-price: 100
-    stock: 1
-    lore:
-      - '&7A trophy from a fearsome foe,'
-      - '&7pulsing with immense power.'
-    commands: []
   dragon_head:
     display-name: '<gradient:#4E004E:#A34BFF>&lDragon Head</gradient>'
     material: DRAGON_HEAD
