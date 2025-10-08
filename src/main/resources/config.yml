@@ -122,18 +122,6 @@ items:
       - '&7An opportunity to'
       - '&7cheat death itself.'
     commands: []
-  strength_potion:
-    display-name: '<gradient:#93291E:#ED213A>&lPotion of Strength II</gradient>'
-    material: POTION
-    chance: 60.0
-    price: 800.0
-    exp-price: 10
-    stock: 5
-    lore:
-      - '&7Unleash your inner fury.'
-      - '&cStrength II (1:30)'
-    commands:
-      - 'give {player} potion{Potion:"minecraft:strong_strength"} 1'
   shulker_box:
     display-name: '<gradient:#8E44AD:#3498DB>&lShulker Box</gradient>'
     material: SHULKER_BOX
