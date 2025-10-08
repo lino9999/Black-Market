@@ -1,13 +1,52 @@
+# -------------------------------------------------- #
+#              Black Market Configuration            #
+# -------------------------------------------------- #
+
 settings:
+  # Set to true to use player experience levels as currency.
+  # Set to false to use a Vault-compatible economy (money).
   use-levels: true
+
+  # The maximum number of items that will be randomly selected to appear in the market each day.
   max-items-per-day: 7
+
+  # The chance (from 0.0 to 1.0) for an item to be on sale.
+  # Example: 0.10 means there is a 10% chance for any given item to have a discount.
   discount-chance: 0.10
+
+  # The minimum discount percentage an item can have when it's on sale.
+  # Example: 0.10 = 10% off.
   discount-min: 0.10
-  discount-max: 0.40
-  timezone: UTC
+
+  # The maximum discount percentage an item can have when it's on sale.
+  # Example: 0.50 = 50% off. The actual discount will be a random value between min and max.
+  discount-max: 0.50
+
+  # The timezone for the real-time scheduler.
+  # Use standard identifiers like "UTC", "America/New_York", "Europe/Rome".
+  timezone: Europe/Rome
+
+  # A list of real-time hours (in 24-hour HH:mm format) during which the market will be open.
+  # You can add multiple time ranges. Overnight ranges (e.g., 20:00-02:00) are supported.
   open-hours:
     - '20:00-23:59'
     - '00:00-02:00'
+
+# -------------------------------------------------- #
+#                     Market Items                   #
+# -------------------------------------------------- #
+# You can add, edit, or remove items here.
+# For new items, it's recommended to use the in-game command /bm edit
+# as it correctly handles custom items and NBT data.
+#
+# - display-name: The name of the item. Supports gradients and color codes.
+# - material: The material type from Bukkit.
+# - price: The cost if using a Vault economy.
+# - exp-price: The cost if using experience levels.
+# - stock: How many of this item are available per day.
+# - commands: A list of extra commands to run (e.g., for sound effects). The item is given automatically.
+# -------------------------------------------------- #
+
 items:
   diamond_sword:
     display-name: '<gradient:#00BFFF:#1E90FF>&lDiamond Sword</gradient>'
@@ -18,8 +57,7 @@ items:
     lore:
       - '&7A powerful weapon'
       - '&7forged from diamonds'
-    commands:
-      - 'give {player} diamond_sword 1'
+    commands: []
   god_apple:
     display-name: '<gradient:#FFD700:#FFA500>&lEnchanted Golden Apple</gradient>'
     material: ENCHANTED_GOLDEN_APPLE
@@ -29,8 +67,7 @@ items:
     lore:
       - '&7The ultimate healing item'
       - '&7Grants incredible powers'
-    commands:
-      - 'give {player} enchanted_golden_apple 1'
+    commands: []
   netherite_armor:
     display-name: '<gradient:#4B0082:#8A2BE2>&lNetherite Armor Set</gradient>'
     material: NETHERITE_CHESTPLATE
@@ -42,7 +79,6 @@ items:
       - '&7Maximum protection'
     commands:
       - 'give {player} netherite_helmet 1'
-      - 'give {player} netherite_chestplate 1'
       - 'give {player} netherite_leggings 1'
       - 'give {player} netherite_boots 1'
   elytra:
@@ -54,5 +90,84 @@ items:
     lore:
       - '&7Fly through the skies'
       - '&7The ultimate transportation'
-    commands:
-      - 'give {player} elytra 1'
+    commands: []
+  netherite_ingot:
+    display-name: '<gradient:#434343:#000000>&lNetherite Ingot</gradient>'
+    material: NETHERITE_INGOT
+    price: 7500.0
+    exp-price: 60
+    stock: 2
+    lore:
+      - '&7The pinnacle of materials'
+      - '&7for the ultimate gear.'
+    commands: []
+  trident:
+    display-name: '<gradient:#00A6A6:#00E0E0>&lTrident of the Depths</gradient>'
+    material: TRIDENT
+    price: 3000.0
+    exp-price: 35
+    stock: 1
+    lore:
+      - '&7A rare weapon, humming'
+      - '&7with oceanic power.'
+    commands: []
+  totem_of_undying:
+    display-name: '<gradient:#FFDD00:#FBB034>&lTotem of Undying</gradient>'
+    material: TOTEM_OF_UNDYING
+    price: 4000.0
+    exp-price: 45
+    stock: 1
+    lore:
+      - '&7An opportunity to'
+      - '&7cheat death itself.'
+    commands: []
+  shulker_box:
+    display-name: '<gradient:#8E44AD:#3498DB>&lShulker Box</gradient>'
+    material: SHULKER_BOX
+    price: 2000.0
+    exp-price: 25
+    stock: 3
+    lore:
+      - '&7A portable storage solution'
+      - '&7for the ambitious adventurer.'
+    commands: []
+  nether_star:
+    display-name: '<gradient:#F2F2F2:#8C8C8C>&lNether Star</gradient>'
+    material: NETHER_STAR
+    price: 10000.0
+    exp-price: 100
+    stock: 1
+    lore:
+      - '&7A trophy from a fearsome foe,'
+      - '&7pulsing with immense power.'
+    commands: []
+  dragon_head:
+    display-name: '<gradient:#4E004E:#A34BFF>&lDragon Head</gradient>'
+    material: DRAGON_HEAD
+    price: 6000.0
+    exp-price: 55
+    stock: 1
+    lore:
+      - '&7A rare trophy from the End.'
+      - '&7Its jaw moves when you walk.'
+    commands: []
+  dragon_egg:
+    display-name: '<gradient:#1E001E:#2A002A>&lDragon Egg</gradient>'
+    material: DRAGON_EGG
+    price: 25000.0
+    exp-price: 200
+    stock: 1
+    lore:
+      - '&7The ultimate prize, a symbol'
+      - '&7of conquering the final boss.'
+    commands: []
+  beacon:
+    display-name: '<gradient:#00FFFF:#FFFFFF>&lBeacon</gradient>'
+    material: BEACON
+    price: 15000.0
+    exp-price: 120
+    stock: 1
+    lore:
+      - '&7Project a powerful beam into the sky'
+      - '&7and grant status effects to players.'
+    commands: []
