@@ -58,8 +58,7 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
                         sender.sendMessage(ColorUtil.colorize("&cYou don't have permission to do that."));
                         return true;
                     }
-                    Player player = (Player) sender;
-                    new BlackMarketGUI(plugin, player).open();
+                    new BlackMarketGUI(plugin, (Player) sender).open();
                     return true;
 
                 case "edit":
@@ -71,8 +70,16 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
                         sender.sendMessage(ColorUtil.colorize("&cYou don't have permission to do that."));
                         return true;
                     }
-                    Player editor = (Player) sender;
-                    new EditGUI(plugin, editor).open();
+                    new EditGUI(plugin, (Player) sender).open();
+                    return true;
+
+                case "forcenew":
+                    if (!sender.hasPermission("blackmarket.admin")) {
+                        sender.sendMessage(ColorUtil.colorize("&cYou don't have permission to do that."));
+                        return true;
+                    }
+                    plugin.getBlackMarketManager().forceRefreshItems();
+                    sender.sendMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("command.forcenew")));
                     return true;
             }
 
@@ -93,7 +100,6 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
 
         if (!plugin.getBlackMarketManager().isOpen()) {
             String closedMsg = plugin.getMessageManager().getMessage("command.market-closed");
-
             ZonedDateTime nextOpening = plugin.getBlackMarketManager().getNextOpeningTime();
             if (nextOpening != null) {
                 String timezone = plugin.getConfig().getString("settings.timezone", "UTC");
@@ -102,45 +108,33 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
 
                 long hours = duration.toHours();
                 long minutes = duration.toMinutesPart();
-
                 String countdown = "";
-                if (hours > 0) {
-                    countdown += hours + (hours == 1 ? " hour" : " hours");
-                }
+                if (hours > 0) countdown += hours + (hours == 1 ? " hour" : " hours");
                 if (minutes > 0) {
                     if (!countdown.isEmpty()) countdown += " and ";
                     countdown += minutes + (minutes == 1 ? " minute" : " minutes");
                 }
-                if (countdown.isEmpty() && duration.toSeconds() > 0) {
-                    countdown = "less than a minute";
-                } else if (countdown.isEmpty()) {
-                    countdown = "any moment now";
-                }
-
+                if (countdown.isEmpty() && duration.toSeconds() > 0) countdown = "less than a minute";
+                else if (countdown.isEmpty()) countdown = "any moment now";
                 closedMsg = closedMsg.replace("{countdown}", countdown);
             } else {
                 closedMsg = closedMsg.replace("{countdown}", "a configured time");
             }
-
             player.sendMessage(ColorUtil.colorize(closedMsg));
             return true;
         }
 
         new BlackMarketGUI(plugin, player).open();
-
         return true;
     }
 
     private void showHelp(CommandSender sender, String label) {
         List<String> helpMessages = plugin.getMessageManager().getMessageList("command.help");
         boolean hasAdminPerms = sender.hasPermission("blackmarket.admin");
-
         for (String line : helpMessages) {
             line = line.replace("{label}", label);
             if (line.contains("{admin}")) {
-                if (hasAdminPerms) {
-                    sender.sendMessage(ColorUtil.colorize(line.replace("{admin}", "")));
-                }
+                if (hasAdminPerms) sender.sendMessage(ColorUtil.colorize(line.replace("{admin}", "")));
             } else {
                 sender.sendMessage(ColorUtil.colorize(line));
             }
@@ -150,9 +144,9 @@ public class BlackMarketCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            List<String> subCommands = new ArrayList<>(Arrays.asList("help"));
+            List<String> subCommands = new ArrayList<>(List.of("help"));
             if (sender.hasPermission("blackmarket.admin")) {
-                subCommands.addAll(Arrays.asList("reload", "edit", "forceopen"));
+                subCommands.addAll(Arrays.asList("reload", "edit", "forceopen", "forcenew"));
             }
             return subCommands.stream()
                     .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))

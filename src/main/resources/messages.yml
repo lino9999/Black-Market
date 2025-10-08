@@ -47,6 +47,7 @@ command:
   player-only: '<gradient:#FF416C:#FF4B2B>This command can only be used by players!</gradient>'
   market-closed: '<gradient:#FF6600:#FFCC00>&l[BLACK MARKET]</gradient> &cThe Black Market is closed! It will open in &e{countdown}&c.'
   reload: '<gradient:#00FF00:#00FFFF>&l[BLACK MARKET]</gradient> &aConfiguration and messages reloaded!'
+  forcenew: '<gradient:#00FF00:#00FFFF>&l[BLACK MARKET]</gradient> &aMarket items have been forcefully refreshed!'
   help:
     - '<gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>'
     - '   <gradient:#FF0080:#8000FF>&lBLACK MARKET HELP</gradient>'
@@ -60,6 +61,7 @@ command:
     - '  &e/{label} reload &7- Reload configuration{admin}'
     - '  &e/{label} forceopen &7- Force open the market{admin}'
     - '  &e/{label} edit &7- Edit the market items{admin}'
+    - '  &e/{label} forcenew &7- Force a new selection of items{admin}'
     - ''
     - '&7Aliases: &f/bm, /blackm, /market'
     - '<gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>'

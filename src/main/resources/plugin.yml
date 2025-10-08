@@ -1,5 +1,5 @@
 name: Black-Market
-version: '1.3'
+version: '1.4'
 main: com.Lino.blackMarket.BlackMarket
 author: Lino
 api-version: '1.21'
@@ -7,7 +7,7 @@ softdepend: [Vault]
 commands:
   blackmarket:
     description: Opens the Black Market GUI or shows help
-    usage: /<command> [help|reload|forceopen|edit]
+    usage: /<command> [help|reload|forceopen|edit|forcenew]
     aliases: [bm, blackm, market]
     permission: blackmarket.use
 permissions:

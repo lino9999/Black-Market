@@ -5,7 +5,7 @@
 settings:
   # Set to true to use player experience levels as currency.
   # Set to false to use a Vault-compatible economy (money).
-  use-levels: true
+  use-levels: false
 
   # The maximum number of items that will be randomly selected to appear in the market each day.
   max-items-per-day: 7
@@ -35,22 +35,17 @@ settings:
 # -------------------------------------------------- #
 #                     Market Items                   #
 # -------------------------------------------------- #
-# You can add, edit, or remove items here.
-# For new items, it's recommended to use the in-game command /bm edit
-# as it correctly handles custom items and NBT data.
-#
-# - display-name: The name of the item. Supports gradients and color codes.
-# - material: The material type from Bukkit.
+# - chance: (0-100) How likely the item is to appear. Higher is more common.
+# - stock: How many of this item are available per day.
 # - price: The cost if using a Vault economy.
 # - exp-price: The cost if using experience levels.
-# - stock: How many of this item are available per day.
-# - commands: A list of extra commands to run (e.g., for sound effects). The item is given automatically.
 # -------------------------------------------------- #
 
 items:
   diamond_sword:
     display-name: '<gradient:#00BFFF:#1E90FF>&lDiamond Sword</gradient>'
     material: DIAMOND_SWORD
+    chance: 75.0
     price: 1000.0
     exp-price: 15
     stock: 3
@@ -61,6 +56,7 @@ items:
   god_apple:
     display-name: '<gradient:#FFD700:#FFA500>&lEnchanted Golden Apple</gradient>'
     material: ENCHANTED_GOLDEN_APPLE
+    chance: 20.0
     price: 2500.0
     exp-price: 30
     stock: 1
@@ -71,6 +67,7 @@ items:
   netherite_armor:
     display-name: '<gradient:#4B0082:#8A2BE2>&lNetherite Armor Set</gradient>'
     material: NETHERITE_CHESTPLATE
+    chance: 1.0
     price: 5000.0
     exp-price: 50
     stock: 1
@@ -84,6 +81,7 @@ items:
   elytra:
     display-name: '<gradient:#87CEEB:#00CED1>&lElytra Wings</gradient>'
     material: ELYTRA
+    chance: 25.0
     price: 3500.0
     exp-price: 40
     stock: 1
@@ -94,6 +92,7 @@ items:
   netherite_ingot:
     display-name: '<gradient:#434343:#000000>&lNetherite Ingot</gradient>'
     material: NETHERITE_INGOT
+    chance: 10.0
     price: 7500.0
     exp-price: 60
     stock: 2
@@ -104,6 +103,7 @@ items:
   trident:
     display-name: '<gradient:#00A6A6:#00E0E0>&lTrident of the Depths</gradient>'
     material: TRIDENT
+    chance: 30.0
     price: 3000.0
     exp-price: 35
     stock: 1
@@ -114,6 +114,7 @@ items:
   totem_of_undying:
     display-name: '<gradient:#FFDD00:#FBB034>&lTotem of Undying</gradient>'
     material: TOTEM_OF_UNDYING
+    chance: 20.0
     price: 4000.0
     exp-price: 45
     stock: 1
@@ -121,9 +122,22 @@ items:
       - '&7An opportunity to'
       - '&7cheat death itself.'
     commands: []
+  strength_potion:
+    display-name: '<gradient:#93291E:#ED213A>&lPotion of Strength II</gradient>'
+    material: POTION
+    chance: 60.0
+    price: 800.0
+    exp-price: 10
+    stock: 5
+    lore:
+      - '&7Unleash your inner fury.'
+      - '&cStrength II (1:30)'
+    commands:
+      - 'give {player} potion{Potion:"minecraft:strong_strength"} 1'
   shulker_box:
     display-name: '<gradient:#8E44AD:#3498DB>&lShulker Box</gradient>'
     material: SHULKER_BOX
+    chance: 40.0
     price: 2000.0
     exp-price: 25
     stock: 3
@@ -134,6 +148,7 @@ items:
   nether_star:
     display-name: '<gradient:#F2F2F2:#8C8C8C>&lNether Star</gradient>'
     material: NETHER_STAR
+    chance: 5.0
     price: 10000.0
     exp-price: 100
     stock: 1
@@ -144,6 +159,7 @@ items:
   dragon_head:
     display-name: '<gradient:#4E004E:#A34BFF>&lDragon Head</gradient>'
     material: DRAGON_HEAD
+    chance: 10.0
     price: 6000.0
     exp-price: 55
     stock: 1
@@ -154,6 +170,7 @@ items:
   dragon_egg:
     display-name: '<gradient:#1E001E:#2A002A>&lDragon Egg</gradient>'
     material: DRAGON_EGG
+    chance: 1.0
     price: 25000.0
     exp-price: 200
     stock: 1
@@ -164,6 +181,7 @@ items:
   beacon:
     display-name: '<gradient:#00FFFF:#FFFFFF>&lBeacon</gradient>'
     material: BEACON
+    chance: 4.0
     price: 15000.0
     exp-price: 120
     stock: 1

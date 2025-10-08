@@ -12,7 +12,6 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -43,27 +42,29 @@ public class BlackMarketManager {
         loadTodayItems();
     }
 
+    public void forceRefreshItems() {
+        // Usa l'orario di sistema attuale come seme per garantire una nuova selezione casuale
+        loadTodayItemsWithSeed(System.currentTimeMillis());
+        this.purchasedStocks.clear();
+    }
+
     public void startScheduler() {
         startRealTimeScheduler();
     }
 
     private void startRealTimeScheduler() {
-        if (scheduler != null) {
-            scheduler.cancel();
-        }
+        if (scheduler != null) scheduler.cancel();
         scheduler = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             String timezone = plugin.getConfig().getString("settings.timezone", "UTC");
             ZoneId zoneId;
             try {
                 zoneId = ZoneId.of(timezone);
             } catch (Exception e) {
-                plugin.getLogger().warning("Invalid timezone '" + timezone + "' in config.yml. Defaulting to UTC.");
                 zoneId = ZoneId.of("UTC");
             }
 
             ZonedDateTime now = ZonedDateTime.now(zoneId);
             LocalTime currentTime = now.toLocalTime();
-
             List<String> schedules = plugin.getConfig().getStringList("settings.open-hours");
             boolean shouldBeOpen = false;
 
@@ -73,7 +74,6 @@ public class BlackMarketManager {
                     try {
                         LocalTime startTime = LocalTime.parse(parts[0]);
                         LocalTime endTime = LocalTime.parse(parts[1]);
-
                         if (startTime.isBefore(endTime)) {
                             if (!currentTime.isBefore(startTime) && currentTime.isBefore(endTime)) {
                                 shouldBeOpen = true;
@@ -91,11 +91,8 @@ public class BlackMarketManager {
                 }
             }
 
-            if (shouldBeOpen && !isOpen) {
-                openMarket();
-            } else if (!shouldBeOpen && isOpen) {
-                closeMarket();
-            }
+            if (shouldBeOpen && !isOpen) openMarket();
+            else if (!shouldBeOpen && isOpen) closeMarket();
 
             long newDay = getDayNumber(now);
             if (newDay != currentDay) {
@@ -107,9 +104,7 @@ public class BlackMarketManager {
     }
 
     public void stopScheduler() {
-        if (scheduler != null) {
-            scheduler.cancel();
-        }
+        if (scheduler != null) scheduler.cancel();
     }
 
     public ZonedDateTime getNextOpeningTime() {
@@ -118,13 +113,11 @@ public class BlackMarketManager {
         ZonedDateTime now = ZonedDateTime.now(zoneId);
         LocalTime currentTime = now.toLocalTime();
 
-        List<LocalTime> startTimes = new ArrayList<>();
-        for (String schedule : plugin.getConfig().getStringList("settings.open-hours")) {
-            try {
-                startTimes.add(LocalTime.parse(schedule.split("-")[0]));
-            } catch (Exception ignored) {}
-        }
-        startTimes.sort(Comparator.naturalOrder());
+        List<LocalTime> startTimes = plugin.getConfig().getStringList("settings.open-hours").stream()
+                .map(s -> s.split("-")[0])
+                .map(LocalTime::parse)
+                .sorted()
+                .collect(Collectors.toList());
 
         for (LocalTime startTime : startTimes) {
             if (startTime.isAfter(currentTime)) {
@@ -132,17 +125,12 @@ public class BlackMarketManager {
             }
         }
 
-        if (!startTimes.isEmpty()) {
-            return now.plusDays(1).with(startTimes.get(0));
-        }
-
-        return null;
+        return startTimes.isEmpty() ? null : now.plusDays(1).with(startTimes.get(0));
     }
 
     private void openMarket() {
         isOpen = true;
-        String openMessage = plugin.getMessageManager().getMessage("market.open");
-        Bukkit.broadcastMessage(ColorUtil.colorize(openMessage));
+        Bukkit.broadcastMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("market.open")));
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.playSound(player.getLocation(), Sound.AMBIENT_CAVE, 0.6f, 0.8f);
             player.playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, 0.3f, 0.5f);
@@ -151,8 +139,7 @@ public class BlackMarketManager {
 
     private void closeMarket() {
         isOpen = false;
-        String closeMessage = plugin.getMessageManager().getMessage("market.close");
-        Bukkit.broadcastMessage(ColorUtil.colorize(closeMessage));
+        Bukkit.broadcastMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("market.close")));
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.playSound(player.getLocation(), Sound.AMBIENT_CAVE, 0.5f, 0.6f);
             player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.4f, 0.7f);
@@ -168,32 +155,62 @@ public class BlackMarketManager {
         return now.toEpochSecond() / 86400L;
     }
 
+    // Metodo di supporto per usare il seme giornaliero
     private void loadTodayItems() {
-        if (allItemsCache == null) {
-            allItemsCache = plugin.getConfigManager().getItems();
-        }
+        loadTodayItemsWithSeed(this.currentDay);
+    }
 
-        boolean useLevels = plugin.useLevels();
-        List<BlackMarketItem> availableItems = allItemsCache.stream()
-                .filter(item -> useLevels ? item.getExpPrice() > 0 : item.getPrice() > 0)
-                .collect(Collectors.toList());
-
-        if (availableItems.isEmpty()) {
+    // Metodo principale che accetta un seme per la randomizzazione
+    private void loadTodayItemsWithSeed(long seed) {
+        if (allItemsCache == null || allItemsCache.isEmpty()) {
             todayItems = new ArrayList<>();
             return;
         }
 
-        Random random = new Random(currentDay);
-        Collections.shuffle(availableItems, random);
+        boolean useLevels = plugin.useLevels();
+        List<BlackMarketItem> potentialItems = allItemsCache.stream()
+                .filter(item -> useLevels ? item.getExpPrice() > 0 : item.getPrice() > 0)
+                .collect(Collectors.toList());
 
+        if (potentialItems.isEmpty()) {
+            todayItems = new ArrayList<>();
+            return;
+        }
+
+        List<BlackMarketItem> selectedItems = new ArrayList<>();
+        Random random = new Random(seed);
         int maxItems = plugin.getConfig().getInt("settings.max-items-per-day", 9);
-        int itemCount = Math.min(maxItems, availableItems.size());
-        todayItems = new ArrayList<>(availableItems.subList(0, itemCount));
+        int itemsToSelect = Math.min(maxItems, potentialItems.size());
+
+        for (int i = 0; i < itemsToSelect; i++) {
+            double totalWeight = potentialItems.stream().mapToDouble(BlackMarketItem::getChance).sum();
+            if (totalWeight <= 0) break;
+
+            double randomValue = random.nextDouble() * totalWeight;
+            BlackMarketItem chosenItem = null;
+
+            for (BlackMarketItem item : potentialItems) {
+                randomValue -= item.getChance();
+                if (randomValue <= 0) {
+                    chosenItem = item;
+                    break;
+                }
+            }
+
+            if (chosenItem != null) {
+                selectedItems.add(chosenItem);
+                potentialItems.remove(chosenItem);
+            } else if (!potentialItems.isEmpty()) {
+                // Fallback in case of floating point inaccuracies
+                selectedItems.add(potentialItems.get(0));
+                potentialItems.remove(0);
+            }
+        }
+        todayItems = selectedItems;
 
         double discountChance = plugin.getConfig().getDouble("settings.discount-chance", 0.2);
         double discountMin = plugin.getConfig().getDouble("settings.discount-min", 0.05);
         double discountMax = plugin.getConfig().getDouble("settings.discount-max", 0.30);
-
         for (BlackMarketItem item : todayItems) {
             item.setDiscount(0);
             if (random.nextDouble() < discountChance) {
@@ -222,6 +239,8 @@ public class BlackMarketManager {
         plugin.getDatabaseManager().savePurchase(itemId, amount, currentDay);
         return true;
     }
+
+
 
     private BlackMarketItem getItemById(String id) {
         return todayItems.stream().filter(item -> item.getId().equals(id)).findFirst().orElse(null);

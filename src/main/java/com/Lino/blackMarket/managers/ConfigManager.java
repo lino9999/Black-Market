@@ -59,9 +59,10 @@ public class ConfigManager {
             double price = itemSection.getDouble("price", 0.0);
             int expPrice = itemSection.getInt("exp-price", 0);
             int stock = itemSection.getInt("stock", 1);
+            double chance = itemSection.getDouble("chance", 50.0); // Legge la chance, default 50
             List<String> commands = itemSection.getStringList("commands");
 
-            BlackMarketItem bmItem = new BlackMarketItem(id, itemStack, price, expPrice, stock, commands);
+            BlackMarketItem bmItem = new BlackMarketItem(id, itemStack, price, expPrice, stock, commands, chance);
             items.add(bmItem);
         }
         return items;
@@ -76,6 +77,7 @@ public class ConfigManager {
         config.set(path + ".exp-price", 0);
         updateItemPrice(id, currency, price);
         config.set(path + ".stock", 1);
+        config.set(path + ".chance", 50.0); // Imposta una chance di default
         config.set(path + ".commands", new ArrayList<String>());
         plugin.saveConfig();
     }

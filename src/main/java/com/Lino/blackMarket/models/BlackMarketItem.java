@@ -1,6 +1,5 @@
 package com.Lino.blackMarket.models;
 
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -10,20 +9,22 @@ import java.util.List;
 public class BlackMarketItem {
 
     private final String id;
-    private final ItemStack itemStack; // The complete item with all NBT data
+    private final ItemStack itemStack;
     private final double price;
     private final int expPrice;
     private final int stock;
     private final List<String> commands;
+    private final double chance;
     private double discount = 0.0;
 
-    public BlackMarketItem(String id, ItemStack itemStack, double price, int expPrice, int stock, List<String> commands) {
+    public BlackMarketItem(String id, ItemStack itemStack, double price, int expPrice, int stock, List<String> commands, double chance) {
         this.id = id;
         this.itemStack = itemStack;
         this.price = price;
         this.expPrice = expPrice;
         this.stock = stock;
         this.commands = commands;
+        this.chance = chance;
     }
 
     public ItemStack getDisplayItem() {
@@ -35,7 +36,6 @@ public class BlackMarketItem {
         if (meta != null && meta.hasDisplayName()) {
             return meta.getDisplayName();
         }
-        // Fallback for items with no custom name
         return itemStack.getType().name().replace("_", " ").toLowerCase();
     }
 
@@ -52,6 +52,7 @@ public class BlackMarketItem {
     public int getExpPrice() { return expPrice; }
     public int getStock() { return stock; }
     public List<String> getCommands() { return commands; }
+    public double getChance() { return chance; }
     public double getDiscount() { return discount; }
     public void setDiscount(double discount) { this.discount = discount; }
     public boolean hasDiscount() { return discount > 0; }
