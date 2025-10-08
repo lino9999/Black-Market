@@ -117,7 +117,7 @@ public class BlackMarketGUI {
         ItemMeta meta = item.getItemMeta();
 
         if (meta != null) {
-            String displayName = meta.getDisplayName(); // Get name directly from custom item
+            String displayName = meta.getDisplayName();
             if (bmItem.hasDiscount()) {
                 String discountText = plugin.getMessageManager().getMessage("gui.item.discount");
                 displayName += " " + ColorUtil.colorize(discountText.replace("{percent}", String.valueOf(bmItem.getDiscountPercentage())));

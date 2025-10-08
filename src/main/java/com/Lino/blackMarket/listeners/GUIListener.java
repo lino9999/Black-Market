@@ -44,7 +44,6 @@ public class GUIListener implements Listener {
             return;
         }
 
-        // Handle admin button click
         if (clickedItem.getType() == Material.COMMAND_BLOCK && player.hasPermission("blackmarket.admin")) {
             player.closeInventory();
             EditGUI editGUI = new EditGUI(plugin, player);

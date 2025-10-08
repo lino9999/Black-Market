@@ -77,7 +77,7 @@ public class EditListener implements Listener {
         event.setCancelled(true);
         ItemStack clickedItem = event.getCurrentItem();
 
-        if (event.getSlot() == 49) { // Add item button
+        if (event.getSlot() == 49) {
             player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.2f);
             openAddItemGUI(player);
             return;
@@ -90,11 +90,11 @@ public class EditListener implements Listener {
         String itemId = getItemIdFromLore(clickedItem);
         if (itemId == null) return;
 
-        if (event.getClick() == ClickType.LEFT) { // Edit Price
+        if (event.getClick() == ClickType.LEFT) {
             editingItemId.put(player.getUniqueId(), itemId);
             player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
             openCurrencyChoiceGUI(player);
-        } else if (event.getClick() == ClickType.RIGHT) { // Remove Item
+        } else if (event.getClick() == ClickType.RIGHT) {
             removingItemId.put(player.getUniqueId(), itemId);
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 0.8f);
             openRemoveConfirmGUI(player, clickedItem);
@@ -102,7 +102,7 @@ public class EditListener implements Listener {
     }
 
     private void handleAddItemGUIClick(InventoryClickEvent event, Player player) {
-        if (event.getSlot() == 22) { // Confirm button
+        if (event.getSlot() == 22) {
             event.setCancelled(true);
             ItemStack item = event.getInventory().getItem(13);
             if (item != null && item.getType() != Material.AIR) {
@@ -142,18 +142,18 @@ public class EditListener implements Listener {
             return;
         }
 
-        if (event.getSlot() == 11) { // Confirm
+        if (event.getSlot() == 11) {
             plugin.getConfigManager().removeItem(itemId);
             plugin.getConfigManager().reload();
             plugin.getBlackMarketManager().reloadItems();
             player.sendMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("command.edit.item-removed")));
             player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0f, 1.5f);
             player.closeInventory();
-            new EditGUI(plugin, player); // Re-open edit GUI
-        } else if (event.getSlot() == 15) { // Cancel
+            new EditGUI(plugin, player);
+        } else if (event.getSlot() == 15) {
             player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 0.8f);
             player.closeInventory();
-            new EditGUI(plugin, player); // Re-open edit GUI
+            new EditGUI(plugin, player);
         }
     }
 
