@@ -14,6 +14,11 @@ public class ColorUtil {
         return ChatColor.translateAlternateColorCodes('&', formattedMessage);
     }
 
+    public static String decolorize(String message) {
+        if (message == null) return "";
+        return message.replace(ChatColor.COLOR_CHAR, '&');
+    }
+
     private static String applyGradients(String message) {
         Matcher matcher = GRADIENT_PATTERN.matcher(message);
         StringBuffer buffer = new StringBuffer();

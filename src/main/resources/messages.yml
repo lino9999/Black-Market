@@ -20,6 +20,22 @@ gui:
     stock: '<gradient:#BDBBBE:#9D9D9F>Stock:</gradient> &f{stock}/{max}'
     click-to-buy: '<gradient:#00FF00:#00FFFF>&l➤ Click to purchase!</gradient>'
     out-of-stock: '<gradient:#FF0000:#8B0000>&l✖ Out of Stock!</gradient>'
+  edit:
+    title: '<gradient:#FF0080:#8000FF>&lEDIT BLACK MARKET</gradient>'
+    add-item-title: '<gradient:#FF0080:#8000FF>&lADD ITEM</gradient>'
+    add-item-lore:
+      - '<gradient:#ECE9E6:#FFFFFF>Click to add a new item</gradient>'
+      - '<gradient:#ECE9E6:#FFFFFF>to the Black Market.</gradient>'
+    currency-choice-title: '<gradient:#FF0080:#8000FF>&lCHOOSE CURRENCY</gradient>'
+    currency-vault: '&e&lVAULT'
+    currency-levels: '&b&lLEVELS'
+    confirm: '&a&lCONFIRM'
+    admin-button-title: '<gradient:#FF416C:#FF4B2B>&l&nEdit Market</gradient>'
+    admin-button-lore:
+      - '&7Click to open the market editor.'
+    remove-confirm-title: '&4&lCONFIRM REMOVAL'
+    remove-confirm-button: '&a&lCONFIRM'
+    remove-cancel-button: '&c&lCANCEL'
 purchase:
   success: '<gradient:#11998e:#38ef7d>&l[BLACK MARKET]</gradient> &fSuccessfully purchased {item} &ffor &f${price}!'
   success-levels: '<gradient:#11998e:#38ef7d>&l[BLACK MARKET]</gradient> &fSuccessfully purchased {item} &ffor &f{price} levels!'
@@ -29,7 +45,7 @@ purchase:
   error: '<gradient:#FF416C:#FF4B2B>&l[BLACK MARKET]</gradient> &cAn error occurred during purchase!'
 command:
   player-only: '<gradient:#FF416C:#FF4B2B>This command can only be used by players!</gradient>'
-  market-closed: '<gradient:#FF6600:#FFCC00>&l[BLACK MARKET]</gradient> &cThe Black Market is closed! Come back at night.'
+  market-closed: '<gradient:#FF6600:#FFCC00>&l[BLACK MARKET]</gradient> &cThe Black Market is closed! It will open in &e{countdown}&c.'
   reload: '<gradient:#00FF00:#00FFFF>&l[BLACK MARKET]</gradient> &aConfiguration and messages reloaded!'
   help:
     - '<gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>'
@@ -43,6 +59,15 @@ command:
     - '<gradient:#FF416C:#FF4B2B>Admin Commands:{admin}</gradient>'
     - '  &e/{label} reload &7- Reload configuration{admin}'
     - '  &e/{label} forceopen &7- Force open the market{admin}'
+    - '  &e/{label} edit &7- Edit the market items{admin}'
     - ''
     - '&7Aliases: &f/bm, /blackm, /market'
     - '<gradient:#FF0080:#8000FF>&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>'
+  edit:
+    item-added: '<gradient:#00FF00:#00FFFF>&l[BLACK MARKET]</gradient> &aItem added and market reloaded!'
+    item-removed: '<gradient:#FF416C:#FF4B2B>&l[BLACK MARKET]</gradient> &cItem removed and market reloaded!'
+    item-price-updated: '<gradient:#00FF00:#00FFFF>&l[BLACK MARKET]</gradient> &aItem price updated and market reloaded!'
+    no-item-in-slot: '<gradient:#FF416C:#FF4B2B>&l[BLACK MARKET]</gradient> &cPlease place an item in the designated slot!'
+    enter-price-chat: '<gradient:#FDC830:#F37335>&l[BLACK MARKET]</gradient> &ePlease type the price in chat. Type ''cancel'' to abort.'
+    invalid-price: '<gradient:#FF416C:#FF4B2B>&l[BLACK MARKET]</gradient> &cInvalid price! Please enter a valid number.'
+    cancelled: '<gradient:#FFCC00:#FF6600>&l[BLACK MARKET]</gradient> &eOperation cancelled.'

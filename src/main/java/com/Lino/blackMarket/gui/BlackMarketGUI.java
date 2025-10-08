@@ -35,6 +35,7 @@ public class BlackMarketGUI {
     private void setupGUI() {
         fillBorders();
         displayItems();
+        addAdminButton(); // Aggiunto pulsante admin
     }
 
     private void fillBorders() {
@@ -51,6 +52,21 @@ public class BlackMarketGUI {
 
         ItemStack info = createInfoItem();
         inventory.setItem(4, info);
+    }
+
+    private void addAdminButton() {
+        if (player.hasPermission("blackmarket.admin")) {
+            ItemStack adminButton = new ItemStack(Material.COMMAND_BLOCK);
+            ItemMeta meta = adminButton.getItemMeta();
+            if (meta != null) {
+                meta.setDisplayName(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.edit.admin-button-title")));
+                List<String> lore = plugin.getMessageManager().getMessageList("gui.edit.admin-button-lore")
+                        .stream().map(ColorUtil::colorize).collect(Collectors.toList());
+                meta.setLore(lore);
+                adminButton.setItemMeta(meta);
+            }
+            inventory.setItem(49, adminButton); // Bottom center
+        }
     }
 
     private ItemStack createBorderItem() {
@@ -88,10 +104,7 @@ public class BlackMarketGUI {
 
     private void displayItems() {
         List<BlackMarketItem> items = plugin.getBlackMarketManager().getTodayItems();
-        int[] slots = {10, 11, 12, 13, 14, 15, 16,
-                19, 20, 21, 22, 23, 24, 25,
-                28, 29, 30, 31, 32, 33, 34,
-                37, 38, 39, 40, 41, 42, 43};
+        int[] slots = {10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43};
         for (int i = 0; i < Math.min(items.size(), slots.length); i++) {
             BlackMarketItem bmItem = items.get(i);
             ItemStack displayItem = createMarketItem(bmItem);
@@ -104,61 +117,40 @@ public class BlackMarketGUI {
         ItemMeta meta = item.getItemMeta();
 
         if (meta != null) {
-            String displayName = ColorUtil.colorize(bmItem.getDisplayName());
+            String displayName = meta.getDisplayName(); // Get name directly from custom item
             if (bmItem.hasDiscount()) {
                 String discountText = plugin.getMessageManager().getMessage("gui.item.discount");
                 displayName += " " + ColorUtil.colorize(discountText.replace("{percent}", String.valueOf(bmItem.getDiscountPercentage())));
             }
-
             meta.setDisplayName(displayName);
-            List<String> lore = bmItem.getLore().stream()
-                    .map(ColorUtil::colorize)
-                    .collect(Collectors.toList());
+
+            List<String> lore = new ArrayList<>(meta.getLore() != null ? meta.getLore() : new ArrayList<>());
             lore.add("");
 
-            int remainingStock = plugin.getBlackMarketManager().getRemainingStock(bmItem.getId());
-            boolean isOutOfStock = remainingStock <= 0;
             boolean useLevels = plugin.useLevels();
-
             if (bmItem.hasDiscount()) {
                 String originalPriceTemplate = plugin.getMessageManager().getMessage("gui.item.price-original");
                 String discountedPriceTemplate = plugin.getMessageManager().getMessage("gui.item.price-discounted");
-                String originalPriceText;
-                String discountedPriceText;
-
-                if (useLevels) {
-                    originalPriceText = levelFormat.format(bmItem.getExpPrice()) + " levels";
-                    discountedPriceText = levelFormat.format(bmItem.getDiscountedExpPrice()) + " levels";
-                } else {
-                    originalPriceText = "$" + priceFormat.format(bmItem.getPrice());
-                    discountedPriceText = "$" + priceFormat.format(bmItem.getDiscountedPrice());
-                }
+                String originalPriceText = useLevels ? levelFormat.format(bmItem.getExpPrice()) + " levels" : "$" + priceFormat.format(bmItem.getPrice());
+                String discountedPriceText = useLevels ? levelFormat.format(bmItem.getDiscountedExpPrice()) + " levels" : "$" + priceFormat.format(bmItem.getDiscountedPrice());
                 lore.add(ColorUtil.colorize(originalPriceTemplate.replace("{price}", originalPriceText)));
                 lore.add(ColorUtil.colorize(discountedPriceTemplate.replace("{price}", discountedPriceText)));
-
             } else {
                 String priceTemplate = plugin.getMessageManager().getMessage("gui.item.price");
-                String priceText;
-                if (useLevels) {
-                    priceText = levelFormat.format(bmItem.getExpPrice()) + " levels";
-                } else {
-                    priceText = "$" + priceFormat.format(bmItem.getPrice());
-                }
+                String priceText = useLevels ? levelFormat.format(bmItem.getExpPrice()) + " levels" : "$" + priceFormat.format(bmItem.getPrice());
                 lore.add(ColorUtil.colorize(priceTemplate.replace("{price}", priceText)));
             }
 
             String stockMsg = plugin.getMessageManager().getMessage("gui.item.stock");
             lore.add(ColorUtil.colorize(stockMsg
-                    .replace("{stock}", String.valueOf(remainingStock))
+                    .replace("{stock}", String.valueOf(plugin.getBlackMarketManager().getRemainingStock(bmItem.getId())))
                     .replace("{max}", String.valueOf(bmItem.getStock()))));
             lore.add("");
 
-            if (isOutOfStock) {
-                String outOfStockMsg = plugin.getMessageManager().getMessage("gui.item.out-of-stock");
-                lore.add(ColorUtil.colorize(outOfStockMsg));
+            if (plugin.getBlackMarketManager().getRemainingStock(bmItem.getId()) <= 0) {
+                lore.add(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.item.out-of-stock")));
             } else {
-                String clickMsg = plugin.getMessageManager().getMessage("gui.item.click-to-buy");
-                lore.add(ColorUtil.colorize(clickMsg));
+                lore.add(ColorUtil.colorize(plugin.getMessageManager().getMessage("gui.item.click-to-buy")));
             }
 
             meta.setLore(lore);
@@ -169,9 +161,5 @@ public class BlackMarketGUI {
 
     public void open() {
         player.openInventory(inventory);
-    }
-
-    public Inventory getInventory() {
-        return inventory;
     }
 }

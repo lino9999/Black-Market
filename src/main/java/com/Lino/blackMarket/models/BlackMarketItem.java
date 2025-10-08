@@ -4,26 +4,22 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BlackMarketItem {
 
     private final String id;
-    private final String displayName;
-    private final Material material;
-    private final List<String> lore;
+    private final ItemStack itemStack; // The complete item with all NBT data
     private final double price;
     private final int expPrice;
     private final int stock;
     private final List<String> commands;
     private double discount = 0.0;
 
-    public BlackMarketItem(String id, String displayName, Material material, List<String> lore,
-                           double price, int expPrice, int stock, List<String> commands) {
+    public BlackMarketItem(String id, ItemStack itemStack, double price, int expPrice, int stock, List<String> commands) {
         this.id = id;
-        this.displayName = displayName;
-        this.material = material;
-        this.lore = lore;
+        this.itemStack = itemStack;
         this.price = price;
         this.expPrice = expPrice;
         this.stock = stock;
@@ -31,69 +27,35 @@ public class BlackMarketItem {
     }
 
     public ItemStack getDisplayItem() {
-        ItemStack item = new ItemStack(material);
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(displayName);
-            meta.setLore(lore);
-            item.setItemMeta(meta);
-        }
-        return item;
-    }
-
-    public String getId() {
-        return id;
+        return itemStack.clone();
     }
 
     public String getDisplayName() {
-        return displayName;
-    }
-
-    public Material getMaterial() {
-        return material;
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta != null && meta.hasDisplayName()) {
+            return meta.getDisplayName();
+        }
+        // Fallback for items with no custom name
+        return itemStack.getType().name().replace("_", " ").toLowerCase();
     }
 
     public List<String> getLore() {
-        return lore;
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta != null && meta.hasLore()) {
+            return meta.getLore();
+        }
+        return new ArrayList<>();
     }
 
-    public double getPrice() {
-        return price;
-    }
-
-    public int getExpPrice() {
-        return expPrice;
-    }
-
-    public double getDiscountedPrice() {
-        return price * (1 - discount);
-    }
-
-    public int getDiscountedExpPrice() {
-        return (int) (expPrice * (1 - discount));
-    }
-
-    public int getStock() {
-        return stock;
-    }
-
-    public List<String> getCommands() {
-        return commands;
-    }
-
-    public double getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(double discount) {
-        this.discount = discount;
-    }
-
-    public boolean hasDiscount() {
-        return discount > 0;
-    }
-
-    public int getDiscountPercentage() {
-        return (int) (discount * 100);
-    }
+    public String getId() { return id; }
+    public double getPrice() { return price; }
+    public int getExpPrice() { return expPrice; }
+    public int getStock() { return stock; }
+    public List<String> getCommands() { return commands; }
+    public double getDiscount() { return discount; }
+    public void setDiscount(double discount) { this.discount = discount; }
+    public boolean hasDiscount() { return discount > 0; }
+    public int getDiscountPercentage() { return (int) (discount * 100); }
+    public double getDiscountedPrice() { return price * (1 - discount); }
+    public int getDiscountedExpPrice() { return (int) (expPrice * (1 - discount)); }
 }

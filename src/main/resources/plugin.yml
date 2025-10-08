@@ -7,7 +7,7 @@ softdepend: [Vault]
 commands:
   blackmarket:
     description: Opens the Black Market GUI or shows help
-    usage: /<command> [help|reload|forceopen]
+    usage: /<command> [help|reload|forceopen|edit]
     aliases: [bm, blackm, market]
     permission: blackmarket.use
 permissions:

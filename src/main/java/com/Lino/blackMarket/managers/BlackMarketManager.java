@@ -5,7 +5,6 @@ import com.Lino.blackMarket.models.BlackMarketItem;
 import com.Lino.blackMarket.utils.ColorUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -14,10 +13,12 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class BlackMarketManager {
 
@@ -27,48 +28,39 @@ public class BlackMarketManager {
     private List<BlackMarketItem> todayItems;
     private Map<String, Integer> purchasedStocks;
     private long currentDay;
+    private List<BlackMarketItem> allItemsCache;
 
     public BlackMarketManager(BlackMarket plugin) {
         this.plugin = plugin;
         this.purchasedStocks = new HashMap<>();
         this.todayItems = new ArrayList<>();
         this.currentDay = getDayNumber();
+        reloadItems();
+    }
+
+    public void reloadItems() {
+        this.allItemsCache = plugin.getConfigManager().getItems();
         loadTodayItems();
     }
 
     public void startScheduler() {
-        String scheduleMode = plugin.getConfig().getString("settings.schedule-mode", "minecraft-night");
-        if (scheduleMode.equalsIgnoreCase("minecraft-night")) {
-            startMinecraftScheduler();
-        } else if (scheduleMode.equalsIgnoreCase("real-time")) {
-            startRealTimeScheduler();
-        }
-    }
-
-    private void startMinecraftScheduler() {
-        scheduler = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            World world = Bukkit.getWorlds().get(0);
-            long time = world.getTime();
-
-            if (time >= 13000 && time < 23000 && !isOpen) {
-                openMarket();
-            } else if ((time >= 23000 || time < 13000) && isOpen) {
-                closeMarket();
-            }
-
-            long newDay = getDayNumber();
-            if (newDay != currentDay) {
-                currentDay = newDay;
-                loadTodayItems();
-                purchasedStocks.clear();
-            }
-        }, 0L, 100L);
+        startRealTimeScheduler();
     }
 
     private void startRealTimeScheduler() {
+        if (scheduler != null) {
+            scheduler.cancel();
+        }
         scheduler = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             String timezone = plugin.getConfig().getString("settings.timezone", "UTC");
-            ZoneId zoneId = ZoneId.of(timezone);
+            ZoneId zoneId;
+            try {
+                zoneId = ZoneId.of(timezone);
+            } catch (Exception e) {
+                plugin.getLogger().warning("Invalid timezone '" + timezone + "' in config.yml. Defaulting to UTC.");
+                zoneId = ZoneId.of("UTC");
+            }
+
             ZonedDateTime now = ZonedDateTime.now(zoneId);
             LocalTime currentTime = now.toLocalTime();
 
@@ -78,19 +70,23 @@ public class BlackMarketManager {
             for (String schedule : schedules) {
                 String[] parts = schedule.split("-");
                 if (parts.length == 2) {
-                    LocalTime startTime = LocalTime.parse(parts[0]);
-                    LocalTime endTime = LocalTime.parse(parts[1]);
+                    try {
+                        LocalTime startTime = LocalTime.parse(parts[0]);
+                        LocalTime endTime = LocalTime.parse(parts[1]);
 
-                    if (startTime.isBefore(endTime)) {
-                        if (currentTime.isAfter(startTime) && currentTime.isBefore(endTime)) {
-                            shouldBeOpen = true;
-                            break;
+                        if (startTime.isBefore(endTime)) {
+                            if (!currentTime.isBefore(startTime) && currentTime.isBefore(endTime)) {
+                                shouldBeOpen = true;
+                                break;
+                            }
+                        } else {
+                            if (!currentTime.isBefore(startTime) || currentTime.isBefore(endTime)) {
+                                shouldBeOpen = true;
+                                break;
+                            }
                         }
-                    } else {
-                        if (currentTime.isAfter(startTime) || currentTime.isBefore(endTime)) {
-                            shouldBeOpen = true;
-                            break;
-                        }
+                    } catch (Exception e) {
+                        plugin.getLogger().warning("Invalid time format in config.yml: " + schedule);
                     }
                 }
             }
@@ -101,9 +97,9 @@ public class BlackMarketManager {
                 closeMarket();
             }
 
-            int currentDayOfYear = now.getDayOfYear();
-            if (currentDayOfYear != currentDay) {
-                currentDay = currentDayOfYear;
+            long newDay = getDayNumber(now);
+            if (newDay != currentDay) {
+                currentDay = newDay;
                 loadTodayItems();
                 purchasedStocks.clear();
             }
@@ -116,15 +112,37 @@ public class BlackMarketManager {
         }
     }
 
+    public ZonedDateTime getNextOpeningTime() {
+        String timezone = plugin.getConfig().getString("settings.timezone", "UTC");
+        ZoneId zoneId = ZoneId.of(timezone);
+        ZonedDateTime now = ZonedDateTime.now(zoneId);
+        LocalTime currentTime = now.toLocalTime();
+
+        List<LocalTime> startTimes = new ArrayList<>();
+        for (String schedule : plugin.getConfig().getStringList("settings.open-hours")) {
+            try {
+                startTimes.add(LocalTime.parse(schedule.split("-")[0]));
+            } catch (Exception ignored) {}
+        }
+        startTimes.sort(Comparator.naturalOrder());
+
+        for (LocalTime startTime : startTimes) {
+            if (startTime.isAfter(currentTime)) {
+                return now.with(startTime);
+            }
+        }
+
+        if (!startTimes.isEmpty()) {
+            return now.plusDays(1).with(startTimes.get(0));
+        }
+
+        return null;
+    }
+
     private void openMarket() {
         isOpen = true;
         String openMessage = plugin.getMessageManager().getMessage("market.open");
-        if (openMessage != null && !openMessage.contains("not found")) {
-            Bukkit.broadcastMessage(ColorUtil.colorize(openMessage));
-        } else {
-            Bukkit.broadcastMessage(ColorUtil.colorize("&a&l[BLACK MARKET] &fThe Black Market is now OPEN!"));
-        }
-
+        Bukkit.broadcastMessage(ColorUtil.colorize(openMessage));
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.playSound(player.getLocation(), Sound.AMBIENT_CAVE, 0.6f, 0.8f);
             player.playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, 0.3f, 0.5f);
@@ -134,12 +152,7 @@ public class BlackMarketManager {
     private void closeMarket() {
         isOpen = false;
         String closeMessage = plugin.getMessageManager().getMessage("market.close");
-        if (closeMessage != null && !closeMessage.contains("not found")) {
-            Bukkit.broadcastMessage(ColorUtil.colorize(closeMessage));
-        } else {
-            Bukkit.broadcastMessage(ColorUtil.colorize("&c&l[BLACK MARKET] &fThe Black Market is now CLOSED!"));
-        }
-
+        Bukkit.broadcastMessage(ColorUtil.colorize(closeMessage));
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.playSound(player.getLocation(), Sound.AMBIENT_CAVE, 0.5f, 0.6f);
             player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.4f, 0.7f);
@@ -147,37 +160,42 @@ public class BlackMarketManager {
     }
 
     private long getDayNumber() {
-        String scheduleMode = plugin.getConfig().getString("settings.schedule-mode", "minecraft-night");
-        if (scheduleMode.equalsIgnoreCase("minecraft-night")) {
-            World world = Bukkit.getWorlds().get(0);
-            return world.getFullTime() / 24000L;
-        } else {
-            String timezone = plugin.getConfig().getString("settings.timezone", "UTC");
-            ZoneId zoneId = ZoneId.of(timezone);
-            return ZonedDateTime.now(zoneId).getDayOfYear();
-        }
+        String timezone = plugin.getConfig().getString("settings.timezone", "UTC");
+        return getDayNumber(ZonedDateTime.now(ZoneId.of(timezone)));
+    }
+
+    private long getDayNumber(ZonedDateTime now) {
+        return now.toEpochSecond() / 86400L;
     }
 
     private void loadTodayItems() {
-        List<BlackMarketItem> allItems = plugin.getConfigManager().getItems();
-        if (allItems.isEmpty()) {
+        if (allItemsCache == null) {
+            allItemsCache = plugin.getConfigManager().getItems();
+        }
+
+        boolean useLevels = plugin.useLevels();
+        List<BlackMarketItem> availableItems = allItemsCache.stream()
+                .filter(item -> useLevels ? item.getExpPrice() > 0 : item.getPrice() > 0)
+                .collect(Collectors.toList());
+
+        if (availableItems.isEmpty()) {
             todayItems = new ArrayList<>();
             return;
         }
 
         Random random = new Random(currentDay);
-        Collections.shuffle(allItems, random);
+        Collections.shuffle(availableItems, random);
 
         int maxItems = plugin.getConfig().getInt("settings.max-items-per-day", 9);
-        int itemCount = Math.min(maxItems, allItems.size());
-
-        todayItems = new ArrayList<>(allItems.subList(0, itemCount));
+        int itemCount = Math.min(maxItems, availableItems.size());
+        todayItems = new ArrayList<>(availableItems.subList(0, itemCount));
 
         double discountChance = plugin.getConfig().getDouble("settings.discount-chance", 0.2);
         double discountMin = plugin.getConfig().getDouble("settings.discount-min", 0.05);
         double discountMax = plugin.getConfig().getDouble("settings.discount-max", 0.30);
 
         for (BlackMarketItem item : todayItems) {
+            item.setDiscount(0);
             if (random.nextDouble() < discountChance) {
                 double discount = discountMin + (discountMax - discountMin) * random.nextDouble();
                 item.setDiscount(discount);
@@ -185,18 +203,12 @@ public class BlackMarketManager {
         }
     }
 
-    public boolean isOpen() {
-        return isOpen;
-    }
-
-    public List<BlackMarketItem> getTodayItems() {
-        return new ArrayList<>(todayItems);
-    }
+    public boolean isOpen() { return isOpen; }
+    public List<BlackMarketItem> getTodayItems() { return new ArrayList<>(todayItems); }
 
     public int getRemainingStock(String itemId) {
         BlackMarketItem item = getItemById(itemId);
         if (item == null) return 0;
-
         int purchased = purchasedStocks.getOrDefault(itemId, 0);
         return Math.max(0, item.getStock() - purchased);
     }
@@ -204,22 +216,14 @@ public class BlackMarketManager {
     public boolean purchaseItem(String itemId, int amount) {
         BlackMarketItem item = getItemById(itemId);
         if (item == null) return false;
-
-        int purchased = purchasedStocks.getOrDefault(itemId, 0);
-        int remaining = item.getStock() - purchased;
+        int remaining = getRemainingStock(itemId);
         if (remaining < amount) return false;
-
-        purchasedStocks.put(itemId, purchased + amount);
+        purchasedStocks.put(itemId, purchasedStocks.getOrDefault(itemId, 0) + amount);
         plugin.getDatabaseManager().savePurchase(itemId, amount, currentDay);
         return true;
     }
 
     private BlackMarketItem getItemById(String id) {
-        for (BlackMarketItem item : todayItems) {
-            if (item.getId().equals(id)) {
-                return item;
-            }
-        }
-        return null;
+        return todayItems.stream().filter(item -> item.getId().equals(id)).findFirst().orElse(null);
     }
 }

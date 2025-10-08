@@ -1,6 +1,7 @@
 package com.Lino.blackMarket;
 
 import com.Lino.blackMarket.commands.BlackMarketCommand;
+import com.Lino.blackMarket.listeners.EditListener;
 import com.Lino.blackMarket.listeners.GUIListener;
 import com.Lino.blackMarket.managers.BlackMarketManager;
 import com.Lino.blackMarket.managers.ConfigManager;
@@ -51,6 +52,7 @@ public final class BlackMarket extends JavaPlugin {
         }
 
         getServer().getPluginManager().registerEvents(new GUIListener(this), this);
+        getServer().getPluginManager().registerEvents(new EditListener(this), this);
 
         blackMarketManager.startScheduler();
 

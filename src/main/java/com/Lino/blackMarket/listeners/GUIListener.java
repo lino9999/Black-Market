@@ -1,6 +1,7 @@
 package com.Lino.blackMarket.listeners;
 
 import com.Lino.blackMarket.BlackMarket;
+import com.Lino.blackMarket.gui.EditGUI;
 import com.Lino.blackMarket.models.BlackMarketItem;
 import com.Lino.blackMarket.utils.ColorUtil;
 import net.milkbowl.vault.economy.Economy;
@@ -14,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Map;
 
 public class GUIListener implements Listener {
 
@@ -42,13 +44,21 @@ public class GUIListener implements Listener {
             return;
         }
 
+        // Handle admin button click
+        if (clickedItem.getType() == Material.COMMAND_BLOCK && player.hasPermission("blackmarket.admin")) {
+            player.closeInventory();
+            EditGUI editGUI = new EditGUI(plugin, player);
+            editGUI.open();
+            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.2f);
+            return;
+        }
+
         if (clickedItem.getType() == Material.BLACK_STAINED_GLASS_PANE ||
                 clickedItem.getType() == Material.NETHER_STAR) {
             return;
         }
 
-        int slot = event.getSlot();
-        BlackMarketItem item = getItemBySlot(slot);
+        BlackMarketItem item = getItemBySlot(event.getSlot());
         if (item == null) {
             return;
         }
@@ -57,10 +67,7 @@ public class GUIListener implements Listener {
     }
 
     private BlackMarketItem getItemBySlot(int slot) {
-        int[] slots = {10, 11, 12, 13, 14, 15, 16,
-                19, 20, 21, 22, 23, 24, 25,
-                28, 29, 30, 31, 32, 33, 34,
-                37, 38, 39, 40, 41, 42, 43};
+        int[] slots = {10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43};
         int index = -1;
         for (int i = 0; i < slots.length; i++) {
             if (slots[i] == slot) {
@@ -77,80 +84,67 @@ public class GUIListener implements Listener {
     }
 
     private void processPurchase(Player player, BlackMarketItem item) {
-        int remainingStock = plugin.getBlackMarketManager().getRemainingStock(item.getId());
-        if (remainingStock <= 0) {
-            String msg = plugin.getMessageManager().getMessage("purchase.out-of-stock");
-            player.sendMessage(ColorUtil.colorize(msg));
-            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.8f, 0.9f);
-            player.closeInventory();
+        if (plugin.getBlackMarketManager().getRemainingStock(item.getId()) <= 0) {
+            player.sendMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("purchase.out-of-stock")));
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
         }
 
-        String coloredItemName = ColorUtil.colorize(item.getDisplayName());
         boolean useLevels = plugin.useLevels();
+        String coloredItemName = item.getDisplayName();
 
         if (useLevels) {
-            int levelPrice = item.hasDiscount() ?
-                    item.getDiscountedExpPrice() : item.getExpPrice();
-            int playerLevels = player.getLevel();
-
-            if (playerLevels < levelPrice) {
-                String msg = plugin.getMessageManager().getMessage("purchase.insufficient-levels");
-                player.sendMessage(ColorUtil.colorize(msg.replace("{price}", String.valueOf(levelPrice))));
-                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.8f, 0.8f);
+            int price = item.hasDiscount() ? item.getDiscountedExpPrice() : item.getExpPrice();
+            if (player.getLevel() < price) {
+                player.sendMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("purchase.insufficient-levels").replace("{price}", String.valueOf(price))));
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
                 return;
             }
-
-            if (!plugin.getBlackMarketManager().purchaseItem(item.getId(), 1)) {
-                String msg = plugin.getMessageManager().getMessage("purchase.error");
-                player.sendMessage(ColorUtil.colorize(msg));
-                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 0.8f);
-                return;
+            if (tryPurchase(player, item, coloredItemName, String.valueOf(price))) {
+                player.setLevel(player.getLevel() - price);
             }
-
-            player.setLevel(playerLevels - levelPrice);
-            for (String command : item.getCommands()) {
-                String finalCommand = command.replace("{player}", player.getName());
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
-            }
-
-            String msg = plugin.getMessageManager().getMessage("purchase.success-levels");
-            player.sendMessage(ColorUtil.colorize(msg
-                    .replace("{item}", coloredItemName)
-                    .replace("{price}", String.valueOf(levelPrice))));
         } else {
-            Economy economy = plugin.getEconomy();
             double price = item.hasDiscount() ? item.getDiscountedPrice() : item.getPrice();
-
+            Economy economy = plugin.getEconomy();
             if (!economy.has(player, price)) {
-                String msg = plugin.getMessageManager().getMessage("purchase.insufficient-funds");
-                player.sendMessage(ColorUtil.colorize(msg.replace("{price}", String.format("%.2f", price))));
-                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.8f, 0.8f);
+                player.sendMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("purchase.insufficient-funds").replace("{price}", String.format("%.2f", price))));
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
                 return;
             }
-
-            if (!plugin.getBlackMarketManager().purchaseItem(item.getId(), 1)) {
-                String msg = plugin.getMessageManager().getMessage("purchase.error");
-                player.sendMessage(ColorUtil.colorize(msg));
-                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 0.8f);
-                return;
+            if (tryPurchase(player, item, coloredItemName, String.format("%.2f", price))) {
+                economy.withdrawPlayer(player, price);
             }
+        }
+    }
 
-            economy.withdrawPlayer(player, price);
-            for (String command : item.getCommands()) {
-                String finalCommand = command.replace("{player}", player.getName());
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
-            }
-
-            String msg = plugin.getMessageManager().getMessage("purchase.success");
-            player.sendMessage(ColorUtil.colorize(msg
-                    .replace("{item}", coloredItemName)
-                    .replace("{price}", String.format("%.2f", price))));
+    private boolean tryPurchase(Player player, BlackMarketItem item, String coloredItemName, String price) {
+        if (!plugin.getBlackMarketManager().purchaseItem(item.getId(), 1)) {
+            player.sendMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage("purchase.error")));
+            player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.7f, 1.0f);
+            return false;
         }
 
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.2f);
-        player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.6f, 0.8f);
+        giveItemToPlayer(player, item.getDisplayItem());
 
+        for (String command : item.getCommands()) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
+        }
+
+        String messagePath = plugin.useLevels() ? "purchase.success-levels" : "purchase.success";
+        player.sendMessage(ColorUtil.colorize(plugin.getMessageManager().getMessage(messagePath)
+                .replace("{item}", coloredItemName)
+                .replace("{price}", price)));
+
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.8f, 1.5f);
         player.closeInventory();
+        return true;
+    }
+
+    private void giveItemToPlayer(Player player, ItemStack item) {
+        Map<Integer, ItemStack> leftover = player.getInventory().addItem(item);
+        if (!leftover.isEmpty()) {
+            leftover.values().forEach(i -> player.getWorld().dropItemNaturally(player.getLocation(), i));
+            player.sendMessage(ColorUtil.colorize("&cYour inventory was full, so the item was dropped at your feet!"));
+        }
     }
 }

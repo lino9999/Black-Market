@@ -1,10 +1,9 @@
 settings:
   use-levels: true
-  max-items-per-day: 9
-  discount-chance: 0.25
+  max-items-per-day: 7
+  discount-chance: 0.10
   discount-min: 0.10
-  discount-max: 0.50
-  schedule-mode: minecraft-night
+  discount-max: 0.40
   timezone: UTC
   open-hours:
     - '20:00-23:59'
