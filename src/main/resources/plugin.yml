@@ -1,5 +1,5 @@
 name: Black-Market
-version: '1.4'
+version: '1.5'
 main: com.Lino.blackMarket.BlackMarket
 author: Lino
 api-version: '1.21'

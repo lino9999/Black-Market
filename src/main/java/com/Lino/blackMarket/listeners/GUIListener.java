@@ -123,8 +123,12 @@ public class GUIListener implements Listener {
             return false;
         }
 
-        giveItemToPlayer(player, item.getDisplayItem());
+        // Se l'item non ha comandi, consegnalo al giocatore
+        if (item.getCommands() == null || item.getCommands().isEmpty()) {
+            giveItemToPlayer(player, item.getDisplayItem());
+        }
 
+        // Esegui sempre i comandi se presenti
         for (String command : item.getCommands()) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
         }
